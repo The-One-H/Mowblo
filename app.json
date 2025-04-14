@@ -4,9 +4,14 @@
     "slug": "Mowblo",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/Mowblo Logo.jpg",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/images/Mowblo Logo (1).jpg",
+      "resizeMode": "contain",
+      "backgroundColor": "#2F80ED"
+    },
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true
@@ -27,7 +32,7 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/images/Mowblo Logo.jpg",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"

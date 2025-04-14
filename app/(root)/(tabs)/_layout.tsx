@@ -5,7 +5,6 @@ import { Ionicons } from '@expo/vector-icons';
 import Home from './home';
 import Client from './client';
 import Setting from './setting';
-import Stats from './stats';
 import Wallet from './wallet';
 import Weather from './weather';
 
@@ -35,8 +34,6 @@ const TabsLayout = () => {
               iconName = focused ? 'cloudy' : 'cloudy-outline';
             } else if (route.name === 'Wallet') {
               iconName = focused ? 'wallet' : 'wallet-outline';
-            } else if (route.name === 'Stats') {
-              iconName = focused ? 'bar-chart' : 'bar-chart-outline';
             } else if (route.name === 'Setting') {
               iconName = focused ? 'settings' : 'settings-outline';
             }
@@ -49,7 +46,6 @@ const TabsLayout = () => {
         <Tab.Screen name="Client" component={Client} />
         <Tab.Screen name="Weather" component={Weather} />
         <Tab.Screen name="Wallet" component={Wallet} />
-        <Tab.Screen name="Stats" component={Stats} />
         <Tab.Screen name="Setting" component={Setting} />
       </Tab.Navigator>
     </SafeAreaProvider>
