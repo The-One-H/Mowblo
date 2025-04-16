@@ -6,7 +6,7 @@ import Home from './home';
 import Client from './client';
 import Setting from './setting';
 import Wallet from './wallet';
-import Weather from './weather';
+import Job from './job';
 
 const Tab = createBottomTabNavigator();
 
@@ -30,8 +30,8 @@ const TabsLayout = () => {
               iconName = focused ? 'home' : 'home-outline';
             } else if (route.name === 'Client') {
               iconName = focused ? 'person' : 'person-outline';
-            } else if (route.name === 'Weather') {
-              iconName = focused ? 'cloudy' : 'cloudy-outline';
+            } else if (route.name === 'Job') {
+              iconName = focused ? 'briefcase' : 'briefcase-outline';
             } else if (route.name === 'Wallet') {
               iconName = focused ? 'wallet' : 'wallet-outline';
             } else if (route.name === 'Setting') {
@@ -44,7 +44,7 @@ const TabsLayout = () => {
       >
         <Tab.Screen name="Home" component={Home} />
         <Tab.Screen name="Client" component={Client} />
-        <Tab.Screen name="Weather" component={Weather} />
+        <Tab.Screen name="Job" component={Job} />
         <Tab.Screen name="Wallet" component={Wallet} />
         <Tab.Screen name="Setting" component={Setting} />
       </Tab.Navigator>
