@@ -1,0 +1,39 @@
+[
+    {
+      "id": 1,
+      "name": "John Smith",
+      "address": "1226 University Dr",
+      "phone": "+1 (555) 123-4567",
+      "email": "john.smith@email.com",
+      "profileImage": "https://randomuser.me/api/portraits/men/1.jpg",
+      "lastService": "2024-03-15",
+      "nextService": "2024-04-15",
+      "services": ["Lawn Mowing", "Leaf Removal"],
+      "rating": 5
+    },
+    {
+      "id": 2,
+      "name": "Sarah Johnson",
+      "address": "845 Oak Street",
+      "phone": "+1 (555) 987-6543",
+      "email": "sarah.j@email.com",
+      "profileImage": "https://randomuser.me/api/portraits/women/1.jpg",
+      "lastService": "2024-03-10",
+      "nextService": "2024-04-10",
+      "services": ["Lawn Mowing", "Hedge Trimming"],
+      "rating": 4.9
+    },
+    {
+        "id": 3,
+        "name": "Sarah Johnson",
+        "address": "845 Oak Stret",
+        "phone": "+1 (555) 987-6543",
+        "email": "sarah.j@email.com",
+        "profileImage": "https://randomuser.me/api/portraits/women/1.jpg",
+        "lastService": "2024-03-10",
+        "nextService": "2024-04-10",
+        "services": ["Lawn Mowing", "Hedge Trimming"],
+        "rating": 4.9
+      }
+  ]
+  

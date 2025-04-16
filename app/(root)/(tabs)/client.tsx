@@ -1,145 +1,138 @@
-import { Text, View, TouchableOpacity, ScrollView, TextInput, Image } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Image, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import localClients from './../../../data/clients.json';
+import { useEffect, useState } from 'react';
 
-const Client = () => {
+// 🧠 Define what a client looks like
+interface Client {
+  id: number;
+  name: string;
+  address: string;
+  phone: string;
+  email: string;
+  profileImage: string;
+  lastService: string;
+  nextService: string;
+  services: string[];
+  rating: number;
+}
+
+// 🧱 Each client in the list
+const ClientCard = ({ client, onPress }: { client: Client; onPress: () => void }) => (
+  <TouchableOpacity 
+    onPress={onPress}
+    className="bg-white rounded-xl shadow-sm mb-4 p-4"
+  >
+    <View className="flex-row items-center">
+      <Image 
+        source={{ uri: client.profileImage }} 
+        className="w-16 h-16 rounded-full"
+      />
+      <View className="ml-4 flex-1">
+        <Text className="text-lg font-semibold">{client.name}</Text>
+        <Text className="text-gray-500">{client.address}</Text>
+        <View className="flex-row items-center mt-1">
+          <Ionicons name="star" size={16} color="#FFD700" />
+          <Text className="ml-1 text-gray-600">{client.rating}</Text>
+        </View>
+      </View>
+      <Ionicons name="chevron-forward" size={24} color="gray" />
+    </View>
+  </TouchableOpacity>
+);
+
+// 🧾 Detailed view for one client
+const ClientDetail = ({ client, onBack }: { client: Client; onBack: () => void }) => (
+  <View className="flex-1 bg-white">
+    <View className="p-4">
+      <TouchableOpacity 
+        onPress={onBack}
+        className="flex-row items-center mb-4"
+      >
+        <Ionicons name="arrow-back" size={24} color="black" />
+        <Text className="ml-2 text-lg">Back to Clients</Text>
+      </TouchableOpacity>
+
+      <View className="items-center mb-6">
+        <Image 
+          source={{ uri: client.profileImage }} 
+          className="w-24 h-24 rounded-full mb-4"
+        />
+        <Text className="text-2xl font-bold">{client.name}</Text>
+        <Text className="text-gray-500">{client.address}</Text>
+      </View>
+
+      <View className="bg-gray-50 rounded-xl p-4 mb-4">
+        <Text className="text-lg font-semibold mb-2">Contact Information</Text>
+        <TouchableOpacity onPress={() => Linking.openURL(`tel:${client.phone}`)} className="flex-row items-center mb-2">
+          <Ionicons name="call-outline" size={20} color="#4CAF50" />
+          <Text className="ml-2">{client.phone}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => Linking.openURL(`mailto:${client.email}`)} className="flex-row items-center mb-2">
+          <Ionicons name="mail-outline" size={20} color="#4CAF50" />
+          <Text className="ml-2">{client.email}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => Linking.openURL(`sms:${client.phone}`)} className="flex-row items-center">
+          <Ionicons name="chatbubble-outline" size={20} color="#4CAF50" />
+          <Text className="ml-2">Send Message</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View className="bg-gray-50 rounded-xl p-4 mb-4">
+        <Text className="text-lg font-semibold mb-2">Service History</Text>
+        <Text className="text-gray-600">Last Service: {client.lastService}</Text>
+        <Text className="text-gray-600">Next Service: {client.nextService}</Text>
+        <View className="mt-2">
+          <Text className="font-semibold">Active Services:</Text>
+          {client.services.map((service, index) => (
+            <View key={index} className="flex-row items-center mt-1">
+              <Ionicons name="checkmark-circle" size={16} color="#4CAF50" />
+              <Text className="ml-2">{service}</Text>
+            </View>
+          ))}
+        </View>
+      </View>
+    </View>
+  </View>
+);
+
+// 👑 The main screen that shows either the list or a detail
+export default function Clients() {
+  const [clients, setClients] = useState<Client[]>([]);
+  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+
+  useEffect(() => {
+    setClients(localClients); // 💾 Loads the clients from the local JSON file
+  }, []);
+
+  // 🔄 If a client is selected, show their profile
+  if (selectedClient) {
+    return (
+      <SafeAreaView className="flex-1 bg-white">
+        <ClientDetail 
+          client={selectedClient} 
+          onBack={() => setSelectedClient(null)} 
+        />
+      </SafeAreaView>
+    );
+  }
+
+  // 🧱 Otherwise, show the list of client cards
   return (
-    <SafeAreaView className="flex-1 bg-white">
-      {/* Header */}
-      <View className="px-4 pt-2">
-        <View className="flex-row items-center justify-between">
-          <View>
-            <Text className="text-gray-600 text-base">Service now</Text>
-            <TouchableOpacity className="flex-row items-center">
-              <Text className="text-xl font-semibold">1226 University Dr</Text>
-              <Ionicons name="chevron-down" size={20} color="black" />
-            </TouchableOpacity>
-          </View>
-          <TouchableOpacity>
-            <Ionicons name="notifications-outline" size={24} color="black" />
-          </TouchableOpacity>
-        </View>
-
-        {/* Search Bar */}
-        <View className="mt-4 bg-gray-100 rounded-full flex-row items-center px-4 py-2 bottom-2">
-          <Ionicons name="search" size={20} color="gray" />
-          <TextInput 
-            placeholder="Search Services" 
-            className="ml-2 flex-1 text-base"
-            placeholderTextColor="gray"
-          />
-        </View>
-
-        {/* Service Categories */}
+    <SafeAreaView className="flex-1 bg-gray-50">
+      <View className="p-4">
+        <Text className="text-2xl font-bold mb-4">My Clients</Text>
         <ScrollView>
-
-        <ScrollView 
-          horizontal 
-          showsHorizontalScrollIndicator={false} 
-          className="mt-4"
-          >
-          <View className="flex-row space-x-8 px-2">
-            <View className="items-center">
-              <View className="w-16 h-16 bg-[#57caf2] rounded-full items-center justify-center mb-1">
-                <Ionicons name="cut" size={24} color="white" />
-              </View>
-              <Text>Mowing</Text>
-            </View>
-            <View className="items-center">
-              <View className="w-16 h-16 bg-[#4CD964] rounded-full items-center justify-center mb-1">
-                <Ionicons name="leaf" size={24} color="white" />
-              </View>
-              <Text>Cleanup</Text>
-            </View>
-            <View className="items-center">
-              <View className="w-16 h-16 bg-[#FF9500] rounded-full items-center justify-center mb-1">
-                <Ionicons name="water" size={24} color="white" />
-              </View>
-              <Text>Irrigation</Text>
-            </View>
-            <View className="items-center">
-              <View className="w-16 h-16 bg-[#FF3B30] rounded-full items-center justify-center mb-1">
-                <Ionicons name="flower" size={24} color="white" />
-              </View>
-              <Text>Planting</Text>
-            </View>
-            <View className="items-center">
-              <View className="w-16 h-16 bg-[#5856D6] rounded-full items-center justify-center mb-1">
-                <Ionicons name="construct" size={24} color="white" />
-              </View>
-              <Text>Maintenance</Text>
-            </View>
-          </View>
+          {clients.map((client) => (
+            <ClientCard 
+              key={client.id} 
+              client={client} 
+              onPress={() => setSelectedClient(client)} 
+            />
+          ))}
         </ScrollView>
-
-        {/* Quick Actions */}
-        <ScrollView 
-          horizontal 
-          showsHorizontalScrollIndicator={false} 
-          className="mt-4"
-          >
-          <View className="flex-row space-x-3 px-2">
-            <TouchableOpacity className="bg-gray-100 px-4 py-2 rounded-full">
-              <Text>Premium Service</Text>
-            </TouchableOpacity>
-            <TouchableOpacity className="bg-gray-100 px-4 py-2 rounded-full">
-              <Text>Schedule</Text>
-            </TouchableOpacity>
-            <TouchableOpacity className="bg-gray-100 px-4 py-2 rounded-full">
-              <Text>Offers</Text>
-            </TouchableOpacity>
-            <TouchableOpacity className="bg-gray-100 px-4 py-2 rounded-full">
-              <Text>Subscription</Text>
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
-
-        {/* Featured Section */}
-        <View className="mt-6">
-          <View className="flex-row justify-between items-center mb-4">
-            <Text className="text-2xl font-bold">Featured Providers</Text>
-            <TouchableOpacity>
-              <Ionicons name="arrow-forward" size={24} color="black" />
-            </TouchableOpacity>
-          </View>
-
-          {/* Featured Cards */}
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            <View className="flex-row space-x-4">
-              <TouchableOpacity className="w-[300px] bg-white rounded-xl shadow-sm">
-                <View className="h-[150px] bg-gray-200 rounded-t-xl" />
-                <View className="p-3">
-                  <View className="flex-row justify-between items-center">
-                    <Text className="text-lg font-semibold">Green Thumb Pro</Text>
-                    <View className="bg-green-100 px-2 py-1 rounded">
-                      <Text className="text-green-800">⭐ 4.9</Text>
-                    </View>
-                  </View>
-                  <Text className="text-gray-500">$25/hour • 0.5 mi away</Text>
-                  <Text className="text-gray-500">Available Today</Text>
-                </View>
-              </TouchableOpacity>
-
-              <TouchableOpacity className="w-[300px] bg-white rounded-xl shadow-sm">
-                <View className="h-[150px] bg-gray-200 rounded-t-xl" />
-                <View className="p-3">
-                  <View className="flex-row justify-between items-center">
-                    <Text className="text-lg font-semibold">Lawn Masters</Text>
-                    <View className="bg-green-100 px-2 py-1 rounded">
-                      <Text className="text-green-800">⭐ 4.8</Text>
-                    </View>
-                  </View>
-                  <Text className="text-gray-500">$30/hour • 1.2 mi away</Text>
-                  <Text className="text-gray-500">Next Available: Tomorrow</Text>
-                </View>
-              </TouchableOpacity>
-            </View>
-          </ScrollView>
-        </View>
-    </ScrollView>
       </View>
     </SafeAreaView>
   );
-};
-
-export default Client;
+}
