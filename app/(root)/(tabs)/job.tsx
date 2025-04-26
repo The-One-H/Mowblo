@@ -1,40 +1,53 @@
-import { useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, FlatList } from 'react-native';
+import { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Modal from 'react-native-modal';
 import { Ionicons } from '@expo/vector-icons';
 
 // Define the Job type
 interface Job {
-  id: number;
+  id: string;
   clientName: string;
   address: string;
   serviceType: 'lawn' | 'snow';
   description: string;
   price: number;
   date: string;
+  status: 'pending' | 'accepted' | 'completed';
 }
 
-// Mock data - Replace with your actual data source
+// Mock data for jobs
 const mockJobs: Job[] = [
   {
-    id: 1,
+    id: '1',
     clientName: 'John Smith',
-    address: '1226 University Dr',
+    address: '123 Main St, Anytown',
     serviceType: 'lawn',
-    description: 'Need lawn mowing service for a 1/4 acre lot',
+    description: 'Weekly lawn mowing and trimming',
     price: 50,
-    date: '2024-03-25',
+    date: '2024-03-20',
+    status: 'pending'
   },
   {
-    id: 2,
+    id: '2',
     clientName: 'Sarah Johnson',
-    address: '845 Oak Street',
+    address: '456 Oak Ave, Somewhere',
     serviceType: 'snow',
-    description: 'Need driveway and walkway shoveled',
-    price: 35,
-    date: '2024-03-26',
+    description: 'Snow removal for driveway and walkway',
+    price: 75,
+    date: '2024-03-21',
+    status: 'pending'
   },
+  {
+    id: '3',
+    clientName: 'Mike Brown',
+    address: '789 Pine Rd, Elsewhere',
+    serviceType: 'lawn',
+    description: 'Bi-weekly lawn maintenance',
+    price: 60,
+    date: '2024-03-22',
+    status: 'pending'
+  }
 ];
 
 const JobCard = ({ job, onPress }: { job: Job; onPress: () => void }) => (
@@ -63,7 +76,12 @@ const JobCard = ({ job, onPress }: { job: Job; onPress: () => void }) => (
   </TouchableOpacity>
 );
 
-const JobModal = ({ job, isVisible, onClose }: { job: Job; isVisible: boolean; onClose: () => void }) => (
+const JobModal = ({ job, isVisible, onClose, onAccept }: { 
+  job: Job; 
+  isVisible: boolean; 
+  onClose: () => void;
+  onAccept: () => void;
+}) => (
   <Modal
     isVisible={isVisible}
     onBackdropPress={onClose}
@@ -104,7 +122,10 @@ const JobModal = ({ job, isVisible, onClose }: { job: Job; isVisible: boolean; o
       </View>
 
       <View className="flex-row justify-between mt-5">
-        <TouchableOpacity className="bg-green-500 p-4 rounded-lg flex-1 mr-2">
+        <TouchableOpacity 
+          className="bg-green-500 p-4 rounded-lg flex-1 mr-2"
+          onPress={onAccept}
+        >
           <Text className="text-white text-center font-bold">Accept Job</Text>
         </TouchableOpacity>
         <TouchableOpacity 
@@ -121,11 +142,51 @@ const JobModal = ({ job, isVisible, onClose }: { job: Job; isVisible: boolean; o
 export default function Jobs() {
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [isModalVisible, setModalVisible] = useState(false);
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Simulate loading data
+    const timer = setTimeout(() => {
+      setJobs(mockJobs);
+      setLoading(false);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleJobPress = (job: Job) => {
     setSelectedJob(job);
     setModalVisible(true);
   };
+
+  const handleAcceptJob = async () => {
+    if (!selectedJob) return;
+
+    try {
+      // Update the job status locally
+      setJobs(prevJobs => 
+        prevJobs.map(job => 
+          job.id === selectedJob.id 
+            ? { ...job, status: 'accepted' }
+            : job
+        )
+      );
+      
+      setModalVisible(false);
+      setSelectedJob(null);
+    } catch (error) {
+      console.error('Error accepting job:', error);
+    }
+  };
+
+  if (loading) {
+    return (
+      <SafeAreaView className="flex-1 bg-gray-50 items-center justify-center">
+        <ActivityIndicator size="large" color="#4CAF50" />
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
@@ -133,17 +194,23 @@ export default function Jobs() {
         <Text className="text-2xl font-bold">Available Jobs</Text>
       </View>
       
-      <FlatList
-        data={mockJobs}
-        renderItem={({ item }) => (
-          <JobCard 
-            job={item} 
-            onPress={() => handleJobPress(item)}
-          />
-        )}
-        keyExtractor={item => item.id.toString()}
-        contentContainerStyle={{ padding: 16 }}
-      />
+      {jobs.length === 0 ? (
+        <View className="flex-1 items-center justify-center">
+          <Text className="text-gray-500 text-lg">No available jobs at the moment</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={jobs}
+          renderItem={({ item }) => (
+            <JobCard 
+              job={item} 
+              onPress={() => handleJobPress(item)}
+            />
+          )}
+          keyExtractor={item => item.id}
+          contentContainerStyle={{ padding: 16 }}
+        />
+      )}
 
       {selectedJob && (
         <JobModal
@@ -153,6 +220,7 @@ export default function Jobs() {
             setModalVisible(false);
             setSelectedJob(null);
           }}
+          onAccept={handleAcceptJob}
         />
       )}
     </SafeAreaView>
