@@ -2,7 +2,7 @@ import { ScrollView, Text, View, SafeAreaView, TouchableOpacity } from 'react-na
 import { Ionicons } from '@expo/vector-icons';
 import { Link, router } from 'expo-router';
 
-const Home = () => {
+const Feed = () => {
   return (
     <SafeAreaView className="flex-1 bg-[#f8f8f8]">
       {/* Header */}
@@ -124,4 +124,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default Feed;

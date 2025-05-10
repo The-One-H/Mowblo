@@ -98,7 +98,7 @@ const ClientDetail = ({ client, onBack }: { client: Client; onBack: () => void }
 );
 
 // 👑 The main screen that shows either the list or a detail
-export default function Clients() {
+export default function Social() {
   const [clients, setClients] = useState<Client[]>([]);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
 

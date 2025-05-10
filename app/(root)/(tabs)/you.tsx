@@ -3,7 +3,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Link, router } from 'expo-router';
 
-const Setting = () => {
+const You = () => {
   return (
     <SafeAreaView className="flex-1 bg-white">
       {/* Header */}
@@ -84,4 +84,4 @@ const Setting = () => {
   );
 };
 
-export default Setting;
+export default You;

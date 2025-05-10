@@ -2,9 +2,9 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import Home from './home';
-import Client from './client';
-import Setting from './setting';
+import Feed from './feed';
+import Social from './social';
+import You from './you';
 import Wallet from './wallet';
 import Job from './job';
 
@@ -26,27 +26,27 @@ const TabsLayout = () => {
           tabBarIcon: ({ focused, color, size }) => {
             let iconName: keyof typeof Ionicons.glyphMap = 'home';
 
-            if (route.name === 'Home') {
-              iconName = focused ? 'home' : 'home-outline';
-            } else if (route.name === 'Client') {
-              iconName = focused ? 'person' : 'person-outline';
-            } else if (route.name === 'Job') {
+            if (route.name === 'Job') {
               iconName = focused ? 'briefcase' : 'briefcase-outline';
+            } else if (route.name === 'Feed') {
+              iconName = focused ? 'newspaper' : 'newspaper-outline';
+            } else if (route.name === 'Social') {
+              iconName = focused ? 'people' : 'people-outline';
             } else if (route.name === 'Wallet') {
               iconName = focused ? 'wallet' : 'wallet-outline';
-            } else if (route.name === 'Setting') {
-              iconName = focused ? 'settings' : 'settings-outline';
+            } else if (route.name === 'You') {
+              iconName = focused ? 'person-circle' : 'person-circle-outline';
             }
 
             return <Ionicons name={iconName} size={size} color={color} />;
           },
         })}
       >
-        <Tab.Screen name="Home" component={Home} />
-        <Tab.Screen name="Client" component={Client} />
         <Tab.Screen name="Job" component={Job} />
+        <Tab.Screen name="Feed" component={Feed} />
+        <Tab.Screen name="Social" component={Social} />
         <Tab.Screen name="Wallet" component={Wallet} />
-        <Tab.Screen name="Setting" component={Setting} />
+        <Tab.Screen name="You" component={You} />
       </Tab.Navigator>
     </SafeAreaProvider>
   );
