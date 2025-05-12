@@ -1,7 +1,7 @@
 import { Redirect } from "expo-router";
 
 const Main = () => {
-    return <Redirect href="/job" />;
+    return <Redirect href="/welcome" />;
 
 };
 export default Main;
