@@ -3,7 +3,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import Feed from './feed';
-import Social from './social';
+import Community from './community';
 import You from './you';
 import Wallet from './wallet';
 import Job from './job';
@@ -30,7 +30,7 @@ const TabsLayout = () => {
               iconName = focused ? 'briefcase' : 'briefcase-outline';
             } else if (route.name === 'Feed') {
               iconName = focused ? 'newspaper' : 'newspaper-outline';
-            } else if (route.name === 'Social') {
+            } else if (route.name === 'Community') {
               iconName = focused ? 'people' : 'people-outline';
             } else if (route.name === 'Wallet') {
               iconName = focused ? 'wallet' : 'wallet-outline';
@@ -44,7 +44,7 @@ const TabsLayout = () => {
       >
         <Tab.Screen name="Job" component={Job} />
         <Tab.Screen name="Feed" component={Feed} />
-        <Tab.Screen name="Social" component={Social} />
+        <Tab.Screen name="Community" component={Community} />
         <Tab.Screen name="Wallet" component={Wallet} />
         <Tab.Screen name="You" component={You} />
       </Tab.Navigator>
