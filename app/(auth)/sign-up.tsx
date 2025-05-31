@@ -8,7 +8,7 @@ const SignUp = () => {
       <Text className=" text-center text-2xl font-bold text-gray-800 mb-5">Sign Up</Text>
       <TouchableOpacity
         onPress={() => {
-          router.replace('/home');
+          router.replace('/job');
         }}
         className="absolute top-10 right-10 bg-blue-500 py-2 px-4 rounded-full">
         <Text className="text-md font-JakartaBold text-white">Skip</Text>

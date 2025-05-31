@@ -1,7 +1,7 @@
 import { View, Text, ScrollView, TouchableOpacity, Image, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import localClients from './../../../data/clients.json';
+import localClients from '../../../data/clients.json';
 import { useEffect, useState } from 'react';
 
 // 🧠 Define what a client looks like
@@ -98,7 +98,7 @@ const ClientDetail = ({ client, onBack }: { client: Client; onBack: () => void }
 );
 
 // 👑 The main screen that shows either the list or a detail
-export default function Social() {
+export default function Community() {
   const [clients, setClients] = useState<Client[]>([]);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
 
