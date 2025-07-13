@@ -147,10 +147,10 @@ export default function Page() {
             case "form_param_format_invalid":
               if (error.meta?.paramName == "identifier") return 'Your email address was not found.'
             default:
-              return error.longMessage;
+              return error.longMessage?.substring(0,error.longMessage.length-1);
           }
         })
-        setFailedSigninReason(longMessages.join('; ').replace('.', '') + '.')
+        setFailedSigninReason(longMessages.join('; ') + '.')
       }
       setShowSigninError(['email address', 'password'])
       setEmailAddress('')
