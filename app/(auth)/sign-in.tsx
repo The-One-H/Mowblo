@@ -10,17 +10,19 @@
 // };
 // export default SignIn;
 
-import { useSignIn } from '@clerk/clerk-expo'
+import { isClerkAPIResponseError, useSignIn } from '@clerk/clerk-expo'
 import { Link, useRouter } from 'expo-router'
 import FontAwesome from '@expo/vector-icons/FontAwesome'; // TODO: Remove
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { Text, TextInput, TouchableOpacity, TouchableHighlight, StyleSheet, View, Button, Image } from 'react-native'
+import { Text, TextInput, TouchableOpacity, TouchableHighlight, StyleSheet, View, Button, Image, ScrollView } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import React from 'react'
 import { useCallback, useEffect } from 'react'
 import * as WebBrowser from 'expo-web-browser'
 import * as AuthSession from 'expo-auth-session'
 import { useSSO } from '@clerk/clerk-expo'
+
+import { ClerkAPIError } from '@clerk/types'
 
 /**
  * React Hook that preloads the browser for Android devices to reduce authentication load time. Cleanup of the browser on component unmount is handled.
@@ -105,9 +107,23 @@ export default function Page() {
   const [emailAddress, setEmailAddress] = React.useState('')
   const [password, setPassword] = React.useState('')
 
+  const [errors, setErrors] = React.useState<ClerkAPIError[]>()
+  const [showSigninError, setShowSigninError] = React.useState<String[]>([])
+  const [failedSigninReason, setFailedSigninReason] = React.useState('')
+
   // Handle the submission of the sign-in form
   const onSignInPress = async () => {
     if (!isLoaded) return
+
+    // Check that user credentials were entered
+    let missing = []
+    if (emailAddress.length < 1) { missing.push('email address'); }
+    if (password.length < 1) { missing.push('password'); }
+    if (missing.length > 0) {
+      setFailedSigninReason(`Please enter your ${missing.join(' and ')}.`)
+      setShowSigninError(missing)
+      return;
+    }
 
     // Start the sign-in process using the email and password provided
     try {
@@ -119,23 +135,51 @@ export default function Page() {
       // If sign-in process is complete, set the created session as active
       // and redirect the user
       if (signInAttempt.status === 'complete') {
+        setFailedSigninReason('')
         await setActive({ session: signInAttempt.createdSessionId })
         router.replace('/')
       } else {
         // If the status isn't complete, check why. User might need to
         // complete further steps.
         console.error(JSON.stringify(signInAttempt, null, 2))
+        console.error("aaaaaaaaaaa")
+        setFailedSigninReason(JSON.stringify(signInAttempt, null, 2))
+        setShowSigninError(['email address', 'password'])
+        setEmailAddress('')
+        setPassword('')
       }
     } catch (err) {
       // See https://clerk.com/docs/custom-flows/error-handling
       // for more info on error handling
+
+      if (isClerkAPIResponseError(err)) {
+        const longMessages = err.errors.map((error) => {
+          switch (error.code) {
+            case "form_param_format_invalid":
+              if (error.meta?.paramName == "identifier") return 'Your email address was not found.'
+            default:
+              return error.longMessage;
+          }
+        })
+        setFailedSigninReason(longMessages.join('; ').replace('.', '') + '.')
+      }
       console.error(JSON.stringify(err, null, 2))
+      setShowSigninError(['email address', 'password'])
+      setEmailAddress('')
+      setPassword('')
     }
   }
 
   return (
     <>
-      <SafeAreaView className="flex-1 bg-gray-100 py-12">
+      <SafeAreaView className="flex-1 bg-gray-100">
+        <ScrollView
+          className='overflow-visible py-12'
+          alwaysBounceVertical={false}
+          automaticallyAdjustKeyboardInsets={true}
+          keyboardShouldPersistTaps={'never'}
+          showsVerticalScrollIndicator={false}
+        >
         {/* Mowblo logo */}
         <View className='px-12 flex content-center items-center'>
           <Image
@@ -165,26 +209,26 @@ export default function Page() {
             {/* Email login section */}
             <View className='flex content-center gap-3'>
               <TextInput
-                className=' border border-slate-300 focus:border-slate-400 rounded-lg m-0 p-3'
+                className={' border rounded-lg m-0 p-3'+(showSigninError.includes('email address') ? ' border-red-300 focus:border-red-500' : ' border-slate-300 focus:border-slate-400')}
                 autoCapitalize="none"
                 autoComplete='email'
                 enterKeyHint='done'
                 value={emailAddress}
                 placeholder="email@domain.com"
-                placeholderTextColor={'#64748b'}
+                placeholderTextColor={showSigninError.includes('email address') ? '#f87171' : '#64748b'}
                 keyboardType='email-address'
-                onChangeText={(emailAddress) => setEmailAddress(emailAddress)}
+                onChangeText={(emailAddress) => {setEmailAddress(emailAddress); setShowSigninError(showSigninError.filter((missing) => { return missing != 'email address'; }))}}
               />
               <TextInput
-                className=' border border-slate-300 focus:border-slate-400 rounded-lg m-0 p-3'
+                className={' border rounded-lg m-0 p-3'+(showSigninError.includes('password') ? ' border-red-300 focus:border-red-500' : ' border-slate-300 focus:border-slate-400')}
                 autoCapitalize="none"
                 autoComplete='current-password'
                 enterKeyHint='done'
                 value={password}
                 placeholder="password$%*&!"
-                placeholderTextColor={'#64748b'}
+                placeholderTextColor={showSigninError.includes('password') ? '#f87171' : '#64748b'}
                 keyboardType='visible-password'
-                onChangeText={(password) => setPassword(password)}
+                onChangeText={(password) => {setPassword(password); setShowSigninError(showSigninError.filter((missing) => { return missing != 'password'; }))}}
               />
               <TouchableOpacity
                 className='bg-black rounded-lg m-0 p-3 items-center'
@@ -192,6 +236,10 @@ export default function Page() {
               >
                 <Text className='color-white'>Login</Text>
               </TouchableOpacity>
+              {
+                failedSigninReason.length > 0 ?
+                  <Text className='color-red-500'>Error: {failedSigninReason}</Text> : null
+              }
             </View>
 
             {/* Horizontal divider */}
@@ -216,14 +264,14 @@ export default function Page() {
             </View>
 
             {/* Legal */}
-            <View className='flex flex-row flex-wrap justify-center'>
+            <View className='flex flex-row flex-wrap justify-center mb-16'>
               <Text className='color-gray-500'>By clicking continue, you agree to our </Text>
               <TouchableOpacity>
                 <Link
                   className='font-semibold'
                   href={'/(legal)/terms-of-service'}
                 >
-                  Terms of Service
+                  <Text>Terms of Service</Text>
                 </Link>
                 </TouchableOpacity>
               <Text className='color-gray-500'> and </Text>
@@ -232,13 +280,14 @@ export default function Page() {
                   className='font-semibold'
                   href={'/(legal)/privacy-policy'}
                 >
-                  Privacy Policy
+                  <Text>Privacy Policy</Text>
                 </Link>
                 </TouchableOpacity>
               <Text className='color-gray-500'>.</Text>
             </View>
           </View>
         </View>
+        </ScrollView>
       </SafeAreaView>
     </>
   )
