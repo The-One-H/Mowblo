@@ -179,12 +179,21 @@ export default function Page() {
         </View>
 
         {/* Login/out page switcher */}
-        <Link className='px-4 mt-3 mb-6' href="/sign-up">
-          <TouchableOpacity className='flex flex-row items-center justify-center'>
-            <Ionicons name={'chevron-back-outline'} size={24} color={'black'}></Ionicons>
+        <View className='px-4 mt-3 mb-6 flex flex-row float-left items-center'>
+          <TouchableOpacity
+            onPress={() => {
+              router.replace('/(auth)/sign-up');
+            }}
+            className='flex flex-row'
+          >
+            <Ionicons
+              name={'chevron-back-outline'}
+              size={24}
+              color={'black'}
+            ></Ionicons>
             <Text className=' text-lg'>or Signup</Text>
           </TouchableOpacity>
-        </Link>
+        </View>
 
         {/* Content */}
         <View className='px-12'>
