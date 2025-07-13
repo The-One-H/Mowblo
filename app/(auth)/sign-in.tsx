@@ -152,7 +152,6 @@ export default function Page() {
         })
         setFailedSigninReason(longMessages.join('; ').replace('.', '') + '.')
       }
-      console.error(JSON.stringify(err, null, 2))
       setShowSigninError(['email address', 'password'])
       setEmailAddress('')
       setPassword('')
@@ -169,122 +168,123 @@ export default function Page() {
           keyboardShouldPersistTaps={'never'}
           showsVerticalScrollIndicator={false}
         >
-        {/* Mowblo logo */}
-        <View className='px-12 flex content-center items-center'>
-          <Image
-            className=' w-1/2 h-[undefined] aspect-[303/71]'
-            resizeMode='contain'
-            source={require('../../assets/images/moblo-inline-transparent.png')}
-          />
-        </View>
+          {/* Mowblo logo */}
+          <View className='px-12 flex content-center items-center'>
+            <Image
+              className=' w-1/2 h-[undefined] aspect-[303/71]'
+              resizeMode='contain'
+              source={require('../../assets/images/moblo-inline-transparent.png')}
+            />
+          </View>
 
-        {/* Login/out page switcher */}
-        <View className='px-4 mt-3 mb-6 flex flex-row float-left items-center'>
-          <TouchableOpacity
-            onPress={() => {
-              router.replace('/(auth)/sign-up');
-            }}
-            className='flex flex-row'
-          >
-            <Ionicons
-              name={'chevron-back-outline'}
-              size={24}
-              color={'black'}
-            ></Ionicons>
-            <Text className=' text-lg'>or Signup</Text>
-          </TouchableOpacity>
-        </View>
+          {/* Login/out page switcher */}
+          <View className='px-4 mt-3 mb-6 flex flex-row float-left items-center'>
+            <TouchableOpacity
+              onPress={() => {
+                router.replace('/(auth)/sign-up');
+              }}
+              className='flex flex-row'
+            >
+              <Ionicons
+                name={'chevron-back-outline'}
+                size={24}
+                color={'black'}
+              ></Ionicons>
+              <Text className=' text-lg'>or Signup</Text>
+            </TouchableOpacity>
+          </View>
 
-        {/* Content */}
-        <View className='px-12'>
-          <View className='flex content-center gap-6'> {/* Form content */}
-            {/* Titles */}
-            <View className='flex content-center items-center gap-0'>
-              <Text className='text-xl font-bold center'>Welcome Back!</Text>
-              <Text>Enter your email and password to continue</Text>
-            </View>
-
-            {/* Email login section */}
-            <View className='flex content-center gap-3'>
-              <TextInput
-                className={' border rounded-lg m-0 p-3'+(showSigninError.includes('email address') ? ' border-red-300 focus:border-red-500' : ' border-slate-300 focus:border-slate-400')}
-                autoCapitalize="none"
-                autoComplete='email'
-                enterKeyHint='done'
-                value={emailAddress}
-                placeholder="email@domain.com"
-                placeholderTextColor={showSigninError.includes('email address') ? '#f87171' : '#64748b'}
-                keyboardType='email-address'
-                onChangeText={(emailAddress) => {setEmailAddress(emailAddress); setShowSigninError(showSigninError.filter((missing) => { return missing != 'email address'; }))}}
-              />
-              <TextInput
-                className={' border rounded-lg m-0 p-3'+(showSigninError.includes('password') ? ' border-red-300 focus:border-red-500' : ' border-slate-300 focus:border-slate-400')}
-                autoCapitalize="none"
-                autoComplete='current-password'
-                enterKeyHint='done'
-                value={password}
-                placeholder="password$%*&!"
-                placeholderTextColor={showSigninError.includes('password') ? '#f87171' : '#64748b'}
-                keyboardType='visible-password'
-                onChangeText={(password) => {setPassword(password); setShowSigninError(showSigninError.filter((missing) => { return missing != 'password'; }))}}
-              />
-              <TouchableOpacity
-                className='bg-black rounded-lg m-0 p-3 items-center'
-                onPress={onSignInPress}
-              >
-                <Text className='color-white'>Login</Text>
-              </TouchableOpacity>
-              {
-                failedSigninReason.length > 0 ?
-                  <Text className='color-red-500'>Error: {failedSigninReason}</Text> : null
-              }
-            </View>
-
-            {/* Horizontal divider */}
-            <View className='flex-row items-center'>
-              <View className='flex-1 h-1 border-b-slate-400 border-b-hairline'></View>
-              <View>
-                <Text className='px-4 text-center color-slate-500'>or</Text>
+          {/* Content */}
+          <View className='px-12'>
+            <View className='flex content-center gap-6'>{/* Form content */}
+              {/* Titles */}
+              <View className='flex content-center items-center gap-0'>
+                <Text className='text-xl font-bold center'>Welcome Back!</Text>
+                <Text>Enter your email and password to continue</Text>
               </View>
-              <View className='flex-1 h-1 border-b-slate-400 border-b-hairline'></View>
-            </View>
 
-            {/* OAuth section */}
-            <View className='flex flex-col gap-2'>
-              <TouchableOpacity className='bg-gray-200 rounded-md p-2 flex flex-row items-center justify-center gap-2' onPress={onPressGoogle}>
-                <Ionicons name={'logo-google'} size={20} color={'black'}></Ionicons>
-                <Text className=' font-semibold'>Continue with Google</Text>
-              </TouchableOpacity>
-              <TouchableOpacity className='bg-gray-200 rounded-md p-2 flex flex-row items-center justify-center gap-2' onPress={onPressApple}>
-                <Ionicons name={'logo-apple'} size={20} color={'black'}></Ionicons>
-                <Text className=' font-semibold'>Continue with Apple</Text>
-              </TouchableOpacity>
-            </View>
+              {/* Email login section */}
+              <View className='flex content-center gap-3'>
+                <TextInput
+                  className={' border rounded-lg m-0 p-3'+(showSigninError.includes('email address') ? ' border-red-300 focus:border-red-500' : ' border-slate-300 focus:border-slate-400')}
+                  autoCapitalize="none"
+                  autoComplete='email'
+                  enterKeyHint='done'
+                  value={emailAddress}
+                  placeholder="email@domain.com"
+                  placeholderTextColor={showSigninError.includes('email address') ? '#f87171' : '#64748b'}
+                  keyboardType='email-address'
+                  onChangeText={(emailAddress) => {setEmailAddress(emailAddress); setShowSigninError(showSigninError.filter((missing) => { return missing != 'email address'; }))}}
+                />
+                <TextInput
+                  className={' border rounded-lg m-0 p-3'+(showSigninError.includes('password') ? ' border-red-300 focus:border-red-500' : ' border-slate-300 focus:border-slate-400')}
+                  autoCapitalize="none"
+                  autoComplete='current-password'
+                  enterKeyHint='done'
+                  value={password}
+                  placeholder="password$%*&!"
+                  placeholderTextColor={showSigninError.includes('password') ? '#f87171' : '#64748b'}
+                  keyboardType='visible-password'
+                  secureTextEntry={true}
+                  onChangeText={(password) => {setPassword(password); setShowSigninError(showSigninError.filter((missing) => { return missing != 'password'; }))}}
+                />
+                <TouchableOpacity
+                  className='bg-black rounded-lg m-0 p-3 items-center'
+                  onPress={onSignInPress}
+                >
+                  <Text className='color-white'>Login</Text>
+                </TouchableOpacity>
+                {
+                  failedSigninReason.length > 0 ?
+                    <Text className='color-red-500'>Error: {failedSigninReason}</Text> : null
+                }
+              </View>
 
-            {/* Legal */}
-            <View className='flex flex-row flex-wrap justify-center mb-16'>
-              <Text className='color-gray-500'>By clicking continue, you agree to our </Text>
-              <TouchableOpacity>
-                <Link
-                  className='font-semibold'
-                  href={'/(legal)/terms-of-service'}
-                >
-                  <Text>Terms of Service</Text>
-                </Link>
+              {/* Horizontal divider */}
+              <View className='flex-row items-center'>
+                <View className='flex-1 h-1 border-b-slate-400 border-b-hairline'></View>
+                <View>
+                  <Text className='px-4 text-center color-slate-500'>or</Text>
+                </View>
+                <View className='flex-1 h-1 border-b-slate-400 border-b-hairline'></View>
+              </View>
+
+              {/* OAuth section */}
+              <View className='flex flex-col gap-2'>
+                <TouchableOpacity className='bg-gray-200 rounded-md p-2 flex flex-row items-center justify-center gap-2' onPress={onPressGoogle}>
+                  <Ionicons name={'logo-google'} size={20} color={'black'}></Ionicons>
+                  <Text className=' font-semibold'>Continue with Google</Text>
                 </TouchableOpacity>
-              <Text className='color-gray-500'> and </Text>
-              <TouchableOpacity>
-                <Link
-                  className='font-semibold'
-                  href={'/(legal)/privacy-policy'}
-                >
-                  <Text>Privacy Policy</Text>
-                </Link>
+                <TouchableOpacity className='bg-gray-200 rounded-md p-2 flex flex-row items-center justify-center gap-2' onPress={onPressApple}>
+                  <Ionicons name={'logo-apple'} size={20} color={'black'}></Ionicons>
+                  <Text className=' font-semibold'>Continue with Apple</Text>
                 </TouchableOpacity>
-              <Text className='color-gray-500'>.</Text>
+              </View>
+
+              {/* Legal */}
+              <View className='flex flex-row flex-wrap justify-center mb-16'>
+                <Text className='color-gray-500'>By clicking continue, you agree to our </Text>
+                <TouchableOpacity>
+                  <Link
+                    className='font-semibold'
+                    href={'/(legal)/terms-of-service'}
+                  >
+                    <Text>Terms of Service</Text>
+                  </Link>
+                  </TouchableOpacity>
+                <Text className='color-gray-500'> and </Text>
+                <TouchableOpacity>
+                  <Link
+                    className='font-semibold'
+                    href={'/(legal)/privacy-policy'}
+                  >
+                    <Text>Privacy Policy</Text>
+                  </Link>
+                  </TouchableOpacity>
+                <Text className='color-gray-500'>.</Text>
+              </View>
             </View>
           </View>
-        </View>
         </ScrollView>
       </SafeAreaView>
     </>
