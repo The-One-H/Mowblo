@@ -30,7 +30,7 @@ export const useWarmUpBrowser = () => {
 // Handle any pending authentication sessions
 WebBrowser.maybeCompleteAuthSession()
 
-export default function Page() {
+export default function SignInScreen() {
   const { navAnimation } = useLocalSearchParams();
   
   // Apply requested navigation animation
