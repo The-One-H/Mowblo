@@ -30,8 +30,8 @@ export default function AuthRoutesLayout() {
     return (
         <Stack screenOptions={{headerShown: false}}>
             <Stack.Screen name="welcome" />
-            <Stack.Screen name="sign-up" />
-            <Stack.Screen name="sign-in" />
+            <Stack.Screen name="sign-up" options={{ animation: 'slide_from_bottom' }}/>
+            <Stack.Screen name="sign-in" options={{ animation: 'slide_from_bottom' }}/>
         </Stack>
     )
 }

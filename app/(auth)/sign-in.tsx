@@ -1,7 +1,6 @@
 
 import { isClerkAPIResponseError, useSignIn } from '@clerk/clerk-expo'
-import { Link, useRouter } from 'expo-router'
-import FontAwesome from '@expo/vector-icons/FontAwesome'; // TODO: Remove
+import { Link, useLocalSearchParams, useNavigation, useRouter } from 'expo-router'
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Text, TextInput, TouchableOpacity, TouchableHighlight, StyleSheet, View, Button, Image, ScrollView } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -32,6 +31,16 @@ export const useWarmUpBrowser = () => {
 WebBrowser.maybeCompleteAuthSession()
 
 export default function Page() {
+  const { navAnimation } = useLocalSearchParams();
+  
+  // Apply requested navigation animation
+  if (navAnimation) {
+    const navigation = useNavigation();
+    useEffect(() => {
+      navigation.setOptions({ animation: navAnimation });
+    }, [navigation]);
+  }
+  
   useWarmUpBrowser()
 
   // Use the `useSSO()` hook to access the `startSSOFlow()` method
@@ -181,7 +190,10 @@ export default function Page() {
           <View className='px-4 mt-3 mb-6 flex flex-row float-left items-center'>
             <TouchableOpacity
               onPress={() => {
-                router.replace('/(auth)/sign-up');
+                router.replace({
+                  pathname: '/(auth)/sign-up',
+                  params: { navAnimation: 'slide_from_left' }
+                });
               }}
               className='flex flex-row'
             >
