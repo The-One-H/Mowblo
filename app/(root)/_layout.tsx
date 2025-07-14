@@ -1,10 +1,14 @@
-import { SignedIn, SignedOut } from "@clerk/clerk-expo";
-import { Redirect, Stack } from "expo-router";
-import React from "react";
+import { SignedIn, SignedOut, useAuth } from "@clerk/clerk-expo";
+import { Redirect, Stack, useRouter } from "expo-router";
+import React, { useEffect } from "react";
+import { TouchableOpacity, Text } from "react-native";
 
 
 
 export default function RootLayout() {
+  const { userId, sessionId, getToken, isLoaded, isSignedIn } = useAuth();
+  const router = useRouter()
+
   return (
     <>
       <SignedIn>
@@ -13,7 +17,7 @@ export default function RootLayout() {
         </Stack>
       </SignedIn>
       <SignedOut>
-        <Redirect href={'/(auth)/sign-in'} />
+        <Redirect href={'/(auth)/welcome'} />
       </SignedOut>
     </>
   );

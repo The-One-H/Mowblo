@@ -38,6 +38,11 @@ export default function SignInScreen() {
     const navigation = useNavigation();
     useEffect(() => {
       navigation.setOptions({ animation: navAnimation });
+      const unsubscribe = navigation.addListener('transitionEnd', (e) => {
+        // Do something
+      });
+
+      return unsubscribe;
     }, [navigation]);
   }
   
