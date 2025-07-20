@@ -1,11 +1,11 @@
 
 import { Text,TouchableOpacity,View } from 'react-native';
 
-const SettingsScreen = () => {
+const SecurityScreen = () => {
   return (
       <View className="px-6 py-4 flex-row items-center justify-center">
 
       </View>
   );
 };
-export default SettingsScreen;
+export default SecurityScreen;
