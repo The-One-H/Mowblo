@@ -178,7 +178,11 @@ export default function SignUpScreen() {
             case "form_param_format_invalid":
               if (error.meta?.paramName == "identifier") return 'Your email address was not found.'
             default:
-              return error.longMessage?.substring(0,error.longMessage.length-1);
+              if (error.longMessage?.charAt(error.longMessage.length - 1) == '.') {
+                return error.longMessage?.substring(0,error.longMessage.length-1);
+              } else {
+                return error.longMessage;
+              }
           }
         })
         setFailedSignupReason(longMessages.join('; ') + '.')
@@ -250,9 +254,17 @@ export default function SignUpScreen() {
                 pathname: '/(auth)/sign-up',
                 params: { navAnimation: 'fade' }
               });
-              return error.longMessage?.substring(0,error.longMessage.length-1);
+              if (error.longMessage?.charAt(error.longMessage.length - 1) == '.') {
+                return error.longMessage?.substring(0,error.longMessage.length-1);
+              } else {
+                return error.longMessage;
+              }
             default:
-              return error.longMessage?.substring(0,error.longMessage.length-1);
+              if (error.longMessage?.charAt(error.longMessage.length - 1) == '.') {
+                return error.longMessage?.substring(0,error.longMessage.length-1);
+              } else {
+                return error.longMessage;
+              }
           }
         })
         setFailedVerifyReason(longMessages.join('; ') + '.')

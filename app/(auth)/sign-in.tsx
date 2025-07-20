@@ -160,7 +160,11 @@ export default function SignInScreen() {
             case "form_param_format_invalid":
               if (error.meta?.paramName == "identifier") return 'Your email address was not found.'
             default:
-              return error.longMessage?.substring(0,error.longMessage.length-1);
+              if (error.longMessage?.charAt(error.longMessage.length - 1) == '.') {
+                return error.longMessage?.substring(0,error.longMessage.length-1);
+              } else {
+                return error.longMessage;
+              }
           }
         })
         setFailedSigninReason(longMessages.join('; ') + '.')
