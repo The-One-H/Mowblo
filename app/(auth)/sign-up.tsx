@@ -108,13 +108,49 @@ export default function SignUpScreen() {
   const [pendingVerification, setPendingVerification] = React.useState(false)
   const [code, setCode] = React.useState<string[]>(['', '', '', '', '', ''])
 
-  const [errors, setErrors] = React.useState<ClerkAPIError[]>()
-  const [showSigninError, setShowSigninError] = React.useState<String[]>([])
-  const [failedSigninReason, setFailedSigninReason] = React.useState('')
+  const [showSignupError, setShowSignupError] = React.useState<String[]>([])
+  const [failedSignupReason, setFailedSignupReason] = React.useState('')
 
   // Handle submission of sign-up form
   const onSignUpPress = async () => {
     if (!isLoaded) return
+
+    // Check that user credentials were entered
+    let missing = []
+    if (emailAddress.length < 1) { missing.push('email address'); }
+    if (password.length < 1) { missing.push('password'); }
+    if (verifyPassword.length < 1) { missing.push('verified password'); }
+    if (missing.length > 0) {
+      setFailedSignupReason(`Please enter your ${[missing.slice(0, -1).join(', '), missing[missing.length - 1]].filter((val) => { return val.length > 0}).join(' and ')}.`)
+      setShowSignupError(missing)
+      return;
+    }
+    
+    // Check that the email makes at least a bit of sense
+    if (emailAddress.indexOf('@') >= emailAddress.lastIndexOf('.')) {
+      setFailedSignupReason('Your email address is invalid')
+      setShowSignupError(['email address'])
+      setEmailAddress('')
+      return;
+    }
+
+    // Check that the password has the required length
+    if (password != verifyPassword) {
+      setFailedSignupReason('Passwords must contain 8 characters or more.')
+      setShowSignupError(['password', 'verified password'])
+      setPassword('')
+      setVerifyPassword('')
+      return;
+    }
+
+    // Check that both passwords match
+    if (password != verifyPassword) {
+      setFailedSignupReason('Your passwords are not the same.')
+      setShowSignupError(['password', 'verified password'])
+      setPassword('')
+      setVerifyPassword('')
+      return;
+    }
 
     // Start sign-up process using email and password provided
     try {
@@ -132,7 +168,23 @@ export default function SignUpScreen() {
     } catch (err) {
       // See https://clerk.com/docs/custom-flows/error-handling
       // for more info on error handling
-      console.error(JSON.stringify(err, null, 2))
+      // console.error(JSON.stringify(err, null, 2))
+
+      if (isClerkAPIResponseError(err)) {
+        const longMessages = err.errors.map((error) => {
+          switch (error.code) {
+            case "form_param_format_invalid":
+              if (error.meta?.paramName == "identifier") return 'Your email address was not found.'
+            default:
+              return error.longMessage?.substring(0,error.longMessage.length-1);
+          }
+        })
+        setFailedSignupReason(longMessages.join('; ') + '.')
+      }
+      setShowSignupError(['email address', 'password', 'verified password'])
+      setEmailAddress('')
+      setPassword('')
+      setVerifyPassword('')
     }
   }
 
@@ -205,6 +257,7 @@ export default function SignUpScreen() {
     }
   }, [])
   
+  // Email verification page
   if (pendingVerification) {
     return (
       <>
@@ -342,6 +395,7 @@ export default function SignUpScreen() {
     )
   }
 
+  // Regular signup page
   return (
     <>
       <SafeAreaView className="flex-1 bg-gray-100">
@@ -394,45 +448,45 @@ export default function SignUpScreen() {
               <View className='flex content-center gap-3'>
                 <TextInput
                   /* Email */
-                  className={' border rounded-lg m-0 p-3'+(showSigninError.includes('email address') ? ' border-red-300 focus:border-red-500' : ' border-slate-300 focus:border-slate-400')}
+                  className={' border rounded-lg m-0 p-3'+(showSignupError.includes('email address') ? ' border-red-300 focus:border-red-500' : ' border-slate-300 focus:border-slate-400')}
                   autoCapitalize="none"
                   autoComplete='email'
                   enterKeyHint='done'
                   autoCorrect={false}
                   value={emailAddress}
                   placeholder="email@domain.com"
-                  placeholderTextColor={showSigninError.includes('email address') ? '#f87171' : '#64748b'}
+                  placeholderTextColor={showSignupError.includes('email address') ? '#f87171' : '#64748b'}
                   keyboardType='email-address'
-                  onChangeText={(emailAddress) => {setEmailAddress(emailAddress); setShowSigninError(showSigninError.filter((missing) => { return missing != 'email address'; }))}}
+                  onChangeText={(emailAddress) => {setEmailAddress(emailAddress); setShowSignupError(showSignupError.filter((missing) => { return missing != 'email address'; }))}}
                 />
                 <View>
                   <TextInput
                     /* Password */
-                    className={' border rounded-b-none rounded-lg m-0 p-3'+(showSigninError.includes('password') ? ' border-red-300 focus:border-red-500' : ' border-slate-300 focus:border-slate-400')}
+                    className={' border rounded-b-none rounded-lg m-0 p-3'+(showSignupError.includes('password') ? ' border-red-300 focus:border-red-500' : ' border-slate-300 focus:border-slate-400')}
                     autoCapitalize="none"
                     autoComplete='new-password'
                     enterKeyHint='done'
                     autoCorrect={false}
                     value={password}
                     placeholder="password$%*&!"
-                    placeholderTextColor={showSigninError.includes('password') ? '#f87171' : '#64748b'}
+                    placeholderTextColor={showSignupError.includes('password') ? '#f87171' : '#64748b'}
                     keyboardType='visible-password'
                     secureTextEntry={true}
-                    onChangeText={(password) => {setPassword(password); setShowSigninError(showSigninError.filter((missing) => { return missing != 'password'; }))}}
+                    onChangeText={(password) => {setPassword(password); setShowSignupError(showSignupError.filter((missing) => { return missing != 'password'; }))}}
                   />
                   <TextInput
                     /* Verify Password */
-                    className={' forced-colors:text-red-500 border border-t-0 rounded-t-none rounded-lg m-0 p-3'+(showSigninError.includes('password') ? ' border-red-300 focus:border-red-500' : ' border-slate-300 focus:border-slate-400')}
+                    className={' forced-colors:text-red-500 border border-t-0 rounded-t-none rounded-lg m-0 p-3'+(showSignupError.includes('verified password') ? ' border-red-300 focus:border-red-500' : ' border-slate-300 focus:border-slate-400')}
                     autoCapitalize="none"
                     autoComplete='new-password'
                     enterKeyHint='done'
                     autoCorrect={false}
                     value={verifyPassword}
                     placeholder="verify password$%*&!"
-                    placeholderTextColor={showSigninError.includes('password') ? '#f87171' : '#64748b'}
+                    placeholderTextColor={showSignupError.includes('verified password') ? '#f87171' : '#64748b'}
                     keyboardType='visible-password'
                     secureTextEntry={true}
-                    onChangeText={(verifyPassword) => {setVerifyPassword(verifyPassword); setShowSigninError(showSigninError.filter((missing) => { return missing != 'password'; }))}}
+                    onChangeText={(verifyPassword) => {setVerifyPassword(verifyPassword); setShowSignupError(showSignupError.filter((missing) => { return missing != 'verified password'; }))}}
                   />
                 </View>
                 <TouchableOpacity
@@ -442,8 +496,8 @@ export default function SignUpScreen() {
                   <Text className='color-white'>Register</Text>
                 </TouchableOpacity>
                 {
-                  failedSigninReason.length > 0 ?
-                    <Text className='color-red-500'>Error: {failedSigninReason}</Text> : null
+                  failedSignupReason.length > 0 ?
+                    <Text className='color-red-500'>Error: {failedSignupReason}</Text> : null
                 }
               </View>
 

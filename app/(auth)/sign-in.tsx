@@ -110,7 +110,6 @@ export default function SignInScreen() {
   const [emailAddress, setEmailAddress] = React.useState('')
   const [password, setPassword] = React.useState('')
 
-  const [errors, setErrors] = React.useState<ClerkAPIError[]>()
   const [showSigninError, setShowSigninError] = React.useState<String[]>([])
   const [failedSigninReason, setFailedSigninReason] = React.useState('')
 
@@ -123,7 +122,7 @@ export default function SignInScreen() {
     if (emailAddress.length < 1) { missing.push('email address'); }
     if (password.length < 1) { missing.push('password'); }
     if (missing.length > 0) {
-      setFailedSigninReason(`Please enter your ${missing.join(' and ')}.`)
+      setFailedSigninReason(`Please enter your ${[missing.slice(0, -1).join(', '), missing[missing.length - 1]].filter((val) => { return val.length > 0}).join(' and ')}.`)
       setShowSigninError(missing)
       return;
     }
