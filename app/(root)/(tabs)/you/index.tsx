@@ -6,23 +6,6 @@ import { SignOutButton } from '@/components/SignOutButton';
 
 const You = () => {
   return (
-    <SafeAreaView className="flex-1 bg-white">
-      {/* Header */}
-      <View className="px-6 py-4 flex-row justify-between items-center">
-        <Text className="text-4xl font-semibold">Settings</Text>
-
-        <SignOutButton></SignOutButton>
-
-        <TouchableOpacity>
-          <View className="relative">
-            <Ionicons name="notifications-outline" size={24} color="black" />
-            <View className="absolute -top-1 -right-1 w-4 h-4 bg-black rounded-full items-center justify-center">
-              <Text className="text-white text-xs">1</Text>
-            </View>
-          </View>
-        </TouchableOpacity>
-      </View>
-
       <ScrollView className="flex-1">
         {/* Profile Section */}
         <Link href = "/(root)/profile">
@@ -36,24 +19,12 @@ const You = () => {
           </View>
         </Link>
 
-        {/* Airbnb Card */}
-        <TouchableOpacity className="mx-6 my-4">
-          <View className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-            <View className="flex-row justify-between">
-              <View className="flex-1">
-                <Text className="text-2xl font-semibold mb-2">Mowblo your lawn</Text>
-                <Text className="text-gray-500 text-base">It's easy to start mowing and earn extra income.</Text>
-              </View>
-              <View className="w-20 h-20">
-                <View className="w-full h-full bg-[#57caf2] rounded-lg" />
-              </View>
-            </View>
-          </View>
-        </TouchableOpacity>
-
         {/* Settings Section */}
         <View className="px-6">
-          <TouchableOpacity className="flex-row items-center py-4 border-b border-gray-200">
+          <TouchableOpacity
+            className="flex-row items-center py-4 border-b border-gray-200"
+            onPress={() => router.navigate('/(root)/(tabs)/you/personal-info')}
+          >
             <Ionicons name="person-outline" size={24} color="black" className="mr-4" />
             <Text className="flex-1 text-lg">Personal information</Text>
             <Ionicons name="chevron-forward" size={24} color="#666" />
@@ -84,7 +55,6 @@ const You = () => {
           </TouchableOpacity>
         </View>
       </ScrollView>
-    </SafeAreaView>
   );
 };
 
