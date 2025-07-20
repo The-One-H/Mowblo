@@ -4,6 +4,7 @@ import { Link, useLocalSearchParams, useNavigation, useRouter } from 'expo-route
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Text, TextInput, TouchableOpacity, TouchableHighlight, StyleSheet, View, Button, Image, ScrollView, Keyboard } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Checkbox from 'expo-checkbox';
 import React, { useRef } from 'react'
 import { useCallback, useEffect } from 'react'
 import * as WebBrowser from 'expo-web-browser'
@@ -105,6 +106,7 @@ export default function SignUpScreen() {
   const [emailAddress, setEmailAddress] = React.useState('')
   const [password, setPassword] = React.useState('')
   const [verifyPassword, setVerifyPassword] = React.useState('')
+  const [acceptsLegalAgreements, setAcceptsLegalAgreements] = React.useState(false)
   const [pendingVerification, setPendingVerification] = React.useState(false)
   const [code, setCode] = React.useState<string[]>(['', '', '', '', '', ''])
 
@@ -515,8 +517,47 @@ export default function SignUpScreen() {
                     onChangeText={(verifyPassword) => {setVerifyPassword(verifyPassword); setShowSignupError(showSignupError.filter((missing) => { return missing != 'verified password'; }))}}
                   />
                 </View>
+
+                {/* Legal checkbox */}
                 <TouchableOpacity
-                  className='bg-black rounded-lg m-0 p-3 items-center'
+                  className='flex flex-row gap-4 items-center justify-betweed px-3'
+                  onPress={() => {
+                    setAcceptsLegalAgreements(!acceptsLegalAgreements)
+                  }}
+                >
+                  <Checkbox
+                    className=''
+                    value={acceptsLegalAgreements}
+                    onValueChange={setAcceptsLegalAgreements}
+                  ></Checkbox>
+                  <View className='flex flex-col justify-center m-0'>
+                    <Text className='color-gray-500'>I have read and consented to Mowblo's </Text>
+                    <View className='flex flex-row m-0'>
+                      <TouchableOpacity>
+                        <Link
+                          className='font-semibold'
+                          href={'/(legal)/terms-of-service'}
+                        >
+                          <Text>Terms of Service</Text>
+                        </Link>
+                      </TouchableOpacity>
+                      <Text className='color-gray-500'> and </Text>
+                      <TouchableOpacity>
+                        <Link
+                          className='font-semibold'
+                          href={'/(legal)/privacy-policy'}
+                        >
+                          <Text>Privacy Policy</Text>
+                        </Link>
+                      </TouchableOpacity>
+                      <Text className='color-gray-500'>.</Text>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  className='bg-black rounded-lg m-0 p-3 items-center disabled:bg-gray-400'
+                  disabled={!acceptsLegalAgreements}
                   onPress={onSignUpPress}
                 >
                   <Text className='color-white'>Register</Text>
