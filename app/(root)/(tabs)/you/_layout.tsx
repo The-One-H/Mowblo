@@ -14,7 +14,18 @@ export default function AuthRoutesLayout() {
         <SafeAreaView className="flex-1 bg-white">
             {/* Header */}
             <View className="px-6 py-4 flex-row justify-between items-center">
-                <Text className="text-4xl font-semibold">Settings</Text>
+                <TouchableOpacity
+                    className="flex flex-row justify-between items-center p-4 m-[-1rem]"
+                    onPress={() => {
+                        router.navigate('/profile')
+                    }}
+                >
+                    <View className="w-14 h-14 rounded-full bg-gray-200 mr-4" />
+                    <View className="flex">
+                        <Text className="text-xl font-semibold">Sam</Text>
+                        <Text className="text-gray-500">Freelancer & Client</Text>
+                    </View>
+                </TouchableOpacity>
 
                 <SignOutButton></SignOutButton>
 

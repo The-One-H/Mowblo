@@ -7,18 +7,6 @@ import { SignOutButton } from '@/components/SignOutButton';
 const You = () => {
   return (
       <ScrollView className="flex-1">
-        {/* Profile Section */}
-        <Link href = "/(root)/profile">
-          <View className="flex-row items-center px-6 py-4 border-b border-gray-200">
-            <View className="w-14 h-14 rounded-full bg-gray-200 mr-4" />
-            <View className="flex-1">
-              <Text className="text-xl font-semibold">Sam</Text>
-              <Text className="text-gray-500">Show profile</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={24} color="#666" />
-          </View>
-        </Link>
-
         {/* Settings Section */}
         <View className="px-6">
           <TouchableOpacity
@@ -26,31 +14,25 @@ const You = () => {
             onPress={() => router.navigate('/(root)/(tabs)/you/personal-info')}
           >
             <Ionicons name="person-outline" size={24} color="black" className="mr-4" />
-            <Text className="flex-1 text-lg">Personal information</Text>
+            <Text className="flex-1 text-lg">Personal Information</Text>
             <Ionicons name="chevron-forward" size={24} color="#666" />
           </TouchableOpacity>
 
           <TouchableOpacity className="flex-row items-center py-4 border-b border-gray-200">
             <Ionicons name="card-outline" size={24} color="black" className="mr-4" />
-            <Text className="flex-1 text-lg">Payments and payouts</Text>
-            <Ionicons name="chevron-forward" size={24} color="#666" />
-          </TouchableOpacity>
-
-          <TouchableOpacity className="flex-row items-center py-4 border-b border-gray-200">
-            <Ionicons name="document-text-outline" size={24} color="black" className="mr-4" />
-            <Text className="flex-1 text-lg">Taxes</Text>
+            <Text className="flex-1 text-lg">Transactions</Text>
             <Ionicons name="chevron-forward" size={24} color="#666" />
           </TouchableOpacity>
 
           <TouchableOpacity className="flex-row items-center py-4 border-b border-gray-200">
             <Ionicons name="lock-closed-outline" size={24} color="black" className="mr-4" />
-            <Text className="flex-1 text-lg">Login & security</Text>
+            <Text className="flex-1 text-lg">Login & Security</Text>
             <Ionicons name="chevron-forward" size={24} color="#666" />
           </TouchableOpacity>
 
           <TouchableOpacity className="flex-row items-center py-4 border-b border-gray-200">
             <Ionicons name="options-outline" size={24} color="black" className="mr-4" />
-            <Text className="flex-1 text-lg">Accessibility</Text>
+            <Text className="flex-1 text-lg">Settings</Text>
             <Ionicons name="chevron-forward" size={24} color="#666" />
           </TouchableOpacity>
         </View>
