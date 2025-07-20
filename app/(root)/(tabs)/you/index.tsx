@@ -33,7 +33,13 @@ const You = () => {
         </TouchableOpacity>
       </View>
 
-      <ScrollView className="flex-1">
+      <ScrollView
+        className="flex-1"
+        alwaysBounceVertical={false}
+        automaticallyAdjustKeyboardInsets={true}
+        keyboardShouldPersistTaps={'never'}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Settings Section */}
         <View className="px-6">
           <TouchableOpacity
