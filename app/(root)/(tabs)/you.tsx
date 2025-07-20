@@ -2,6 +2,7 @@ import { Text, View, TouchableOpacity, Image, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Link, router } from 'expo-router';
+import { SignOutButton } from '@/components/SignOutButton';
 
 const You = () => {
   return (
@@ -9,6 +10,9 @@ const You = () => {
       {/* Header */}
       <View className="px-6 py-4 flex-row justify-between items-center">
         <Text className="text-4xl font-semibold">Settings</Text>
+
+        <SignOutButton></SignOutButton>
+
         <TouchableOpacity>
           <View className="relative">
             <Ionicons name="notifications-outline" size={24} color="black" />
