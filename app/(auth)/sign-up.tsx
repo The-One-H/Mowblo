@@ -191,6 +191,17 @@ export default function SignUpScreen() {
   const [showVerifyError, setShowVerifyError] = React.useState<number[]>([])
   const [failedVerifyReason, setFailedVerifyReason] = React.useState('')
 
+  // "resend code" rate limiter
+  const [resendDelay, setResendDelay] = React.useState<number>(0)
+  const RESEND_DELAY = 30
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setResendDelay(previousTime => (previousTime > 0) ? (previousTime - 1) : 0)
+    }, 1000);
+    
+    return () => clearInterval(interval); 
+  }, [])
+
   // Handle submission of verification form
   const onVerifyPress = async () => {
     if (!isLoaded) return
@@ -227,7 +238,7 @@ export default function SignUpScreen() {
     } catch (err) {
       // See https://clerk.com/docs/custom-flows/error-handling
       // for more info on error handling
-      console.error(JSON.stringify(err, null, 2))
+      // console.error(JSON.stringify(err, null, 2))
 
       if (isClerkAPIResponseError(err)) {
         const longMessages = err.errors.map((error) => {
@@ -246,6 +257,7 @@ export default function SignUpScreen() {
       }
       setShowVerifyError([0, 1, 2, 3, 4, 5, 6])
       setCode(['', '', '', '', '', ''])
+      verifyRefs.current[0].focus();
     }
   }
 
@@ -360,6 +372,20 @@ export default function SignUpScreen() {
                     onPress={onVerifyPress}
                   >
                     <Text className='color-white'>Verify</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    className='m-0 p-3 items-center'
+                    disabled={resendDelay > 0}
+                    onPress={() => {
+                      if (resendDelay > 0) { return; }
+                      setResendDelay(RESEND_DELAY)
+                      onSignUpPress()
+                    }}
+                  >
+                    <Text
+                      className='underline disabled:color-gray-400'
+                      disabled={resendDelay > 0}
+                    >Resend verification code{resendDelay > 0 ? ` ${resendDelay}` : null}</Text>
                   </TouchableOpacity>
                   {
                     failedVerifyReason.length > 0 ?
