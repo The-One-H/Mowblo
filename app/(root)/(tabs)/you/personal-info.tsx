@@ -65,8 +65,6 @@ const PersonalInfoScreen = () => {
           </TouchableOpacity>
         </View>
 
-        <Text>{fullName} ... {savedFullName}</Text>
-
         {/* Full Name field */}
         <Text className='mx-3 my-1 font-semibold text-lg'>Full Name</Text>
         <View className='flex-1 flex-row content-center'>
