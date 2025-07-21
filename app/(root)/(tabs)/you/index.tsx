@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Link, router } from 'expo-router';
 import { SignOutButton } from '@/components/SignOutButton';
 import { useDataFetch } from '@/components/useDataFetch';
+import { ProfileImage } from '@/components/ProfileImage';
 
 const You = () => {
   const [userData, _] = useDataFetch();
@@ -17,7 +18,7 @@ const You = () => {
               router.navigate('/profile')
           }}
         >
-          <View className="w-14 h-14 rounded-full bg-gray-200 mr-4" />
+          <ProfileImage className='w-14 h-14 mr-4'></ProfileImage>
           <View className="flex">
             <Text className="text-xl font-semibold">{userData?.fullName??''}</Text>
             <Text className="text-gray-500">{[(userData?.isFreelancer ? 'Freelancer' : ''), (userData?.isClient ? 'Client' : '')].filter((val) => val != '').join(' & ')}</Text>
