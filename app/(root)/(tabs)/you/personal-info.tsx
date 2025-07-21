@@ -11,16 +11,11 @@ import { addDoc, collection, doc, getDoc, setDoc } from 'firebase/firestore'
 import { initializeApp } from 'firebase/app';
 
 const PersonalInfoScreen = () => {
-  const databaseQuery: DatabaseQuery = new DatabaseQuery();
-  
-  if (!databaseQuery.userId) { return (<Text>Must be signed in!</Text>); }
-  
   const [loadingData, setLoadingData] = React.useState(true)
   const [fullName, setFullName] = React.useState('')
   const [savedFullName, setSavedFullName] = React.useState('')
   
-  
-
+  const databaseQuery: DatabaseQuery = new DatabaseQuery();
   useEffect(() => {
     const fetchData = () => {
       databaseQuery.signIntoFirebaseWithClerk().then(() => {

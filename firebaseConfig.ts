@@ -55,8 +55,16 @@ class DatabaseQuery {
    * Passes data acquired from the Firestore database to given setter functions.
    * 
    * Nested data to be retrieved must be seperated in the `key` via periods. As an example, `names.first` would be valid (if it existed in the database).
+   * 
+   * Leave target blank to query all data.
    */
-  public getFirestoreData = useCallback(async (targets: { key: string, setters: Function[] }[]) => {
+  public getFirestoreData = useCallback(async (
+    targets?: {
+      key: string,
+      setters: Function[]
+    }[] | null | undefined,
+    mainSetter?: Function | null | undefined
+  ) => {
     if (!this.userId) {
       console.error('User not logged in!')
       return;
@@ -66,15 +74,21 @@ class DatabaseQuery {
     const docSnap = await getDoc(docRef)
     if (docSnap.exists()) {
       console.log('Document data:', docSnap.data())
-      targets.forEach(target => {
-        let current: any = docSnap.data()
-        target.key.split('.').forEach(val => {
-          current = current[val]
+      if (typeof targets !== "undefined" && targets) {
+        targets.forEach(target => {
+          let current: any = docSnap.data()
+          target.key.split('.').forEach(val => {
+            current = current[val]
+          });
+          target.setters.forEach(setter => {
+            setter(current);
+          });
         });
-        target.setters.forEach(setter => {
-          setter(current);
-        });
-      });
+      } else if (typeof mainSetter !== "undefined" && mainSetter) {
+        mainSetter(docSnap.data());
+      } else {
+        throw new Error('Unsupported arguments passed!')
+      }
     } else {
       // docSnap.data() will be undefined in this case
       console.log('No such document!')
