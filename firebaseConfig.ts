@@ -1,8 +1,13 @@
 
 import { initializeApp, getApp } from "firebase/app";
-import { initializeAuth, getAuth, getReactNativePersistence } from 'firebase/auth';
+//@ts-ignore
+import { initializeAuth, getAuth, getReactNativePersistence, signInWithCustomToken } from 'firebase/auth';
 import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
-import { getFirestore } from 'firebase/firestore'
+import { doc, getDoc, getFirestore, setDoc } from 'firebase/firestore'
+import { useAuth } from "@clerk/clerk-expo";
+
+import type { GetToken } from '@clerk/types'
+import { useCallback } from "react";
 
 // Optionally import the services that you want to use
 // import {...} from 'firebase/auth';
@@ -34,4 +39,77 @@ const auth = initializeAuth(app, {
   persistence: getReactNativePersistence(ReactNativeAsyncStorage)
 });
 
-export { app, db, auth, getApp, getAuth };
+class DatabaseQuery {
+  getToken: GetToken | undefined;
+  userId: string | null | undefined;
+  
+  constructor() {
+    const { getToken, userId } = useAuth()
+
+    if (!userId) { return; }
+    this.getToken = getToken;
+    this.userId = userId;
+  }
+
+  /**
+   * Passes data acquired from the Firestore database to given setter functions.
+   * 
+   * Nested data to be retrieved must be seperated in the `key` via periods. As an example, `names.first` would be valid (if it existed in the database).
+   */
+  public getFirestoreData = useCallback(async (targets: { key: string, setters: Function[] }[]) => {
+    if (!this.userId) {
+      console.error('User not logged in!')
+      return;
+    }
+    
+    const docRef = doc(db, 'users', this.userId)
+    const docSnap = await getDoc(docRef)
+    if (docSnap.exists()) {
+      console.log('Document data:', docSnap.data())
+      targets.forEach(target => {
+        let current: any = docSnap.data()
+        target.key.split('.').forEach(val => {
+          current = current[val]
+        });
+        target.setters.forEach(setter => {
+          setter(current);
+        });
+      });
+    } else {
+      // docSnap.data() will be undefined in this case
+      console.log('No such document!')
+    }
+
+    return;
+  }, [])
+
+  public signIntoFirebaseWithClerk = useCallback(async () => {
+    if (!this.getToken) {
+      console.error('User not logged in!')
+      return;
+    }
+
+    const token = await this.getToken({ template: 'integration_firebase' })
+
+    const userCredentials = await signInWithCustomToken(auth, token || '')
+    // The userCredentials.user object can call the methods of
+    // the Firebase platform as an authenticated user.
+    console.log('User:', userCredentials.user)
+  }, [])
+
+  public writeFirestoreData = useCallback(async (data: any) => {
+    if (!this.userId) {
+      console.error('User not logged in!')
+      return;
+    }
+
+    try {
+      const docRef = await setDoc(doc(db, 'users', this.userId), data)
+    } catch (e) {
+      console.error("Error adding document: ", e);
+    }
+  }, [])
+}
+
+
+export { app, db, auth, getApp, getAuth, DatabaseQuery };

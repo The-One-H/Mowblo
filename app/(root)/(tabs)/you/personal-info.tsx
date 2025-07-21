@@ -5,61 +5,34 @@ import { ScrollView } from 'react-native-gesture-handler';
 
 import { useAuth, useUser } from '@clerk/clerk-expo'
 
-import { getApp, getAuth, app, auth, db } from '../../../../firebaseConfig'
+import { getApp, getAuth, app, auth, db, DatabaseQuery } from '../../../../firebaseConfig'
 import { signInWithCustomToken } from 'firebase/auth'
 import { addDoc, collection, doc, getDoc, setDoc } from 'firebase/firestore'
 import { initializeApp } from 'firebase/app';
 
 const PersonalInfoScreen = () => {
-  const { getToken, userId } = useAuth()
+  const databaseQuery: DatabaseQuery = new DatabaseQuery();
   
-  if (!userId) { return (<Text>Must be signed in!</Text>); }
+  if (!databaseQuery.userId) { return (<Text>Must be signed in!</Text>); }
   
   const [loadingData, setLoadingData] = React.useState(true)
   const [fullName, setFullName] = React.useState('')
   const [savedFullName, setSavedFullName] = React.useState('')
   
-  const getFirestoreData = async () => {
-    const docRef = doc(db, 'users', userId)
-    const docSnap = await getDoc(docRef)
-    if (docSnap.exists()) {
-      console.log('Document data:', docSnap.data())
-
-      setFullName(docSnap.data().fullName)
-      setSavedFullName(docSnap.data().fullName)
-    } else {
-      // docSnap.data() will be undefined in this case
-      console.log('No such document!')
-    }
-  }
-
-  const signIntoFirebaseWithClerk = async () => {
-    const token = await getToken({ template: 'integration_firebase' })
-
-    const userCredentials = await signInWithCustomToken(auth, token || '')
-    // The userCredentials.user object can call the methods of
-    // the Firebase platform as an authenticated user.
-    console.log('User:', userCredentials.user)
-  }
-
-  const writeFirestoreData = async () => {
-    try {
-      const docRef = await setDoc(doc(db, 'users', userId), {
-        fullName: fullName,
-      })
-
-      setSavedFullName(fullName)
-    } catch (e) {
-      console.error("Error adding document: ", e);
-    }
-  }
+  
 
   useEffect(() => {
-    signIntoFirebaseWithClerk().then(() => {
-      getFirestoreData().then(() => {
-        setLoadingData(false);
+    const fetchData = () => {
+      databaseQuery.signIntoFirebaseWithClerk().then(() => {
+        databaseQuery.getFirestoreData([
+          { key: 'fullName', setters: [setFullName, setSavedFullName] }
+        ]).then(() => {
+          setLoadingData(false);
+        })
       })
-    })
+    }
+      
+    fetchData();
   }, [])
 
   if (loadingData) {
@@ -82,7 +55,7 @@ const PersonalInfoScreen = () => {
           {/* Save Button */}
           <TouchableOpacity
             className='flex w-52 content-center items-center border rounded-lg m-4 mt-0 p-2 bg-green-500 disabled:bg-slate-300 border-slate-300 focus:border-slate-400'
-            onPress={writeFirestoreData}
+            onPress={() => databaseQuery.writeFirestoreData({ fullName: fullName }).then(() => setSavedFullName(fullName))}
             disabled={
               fullName == savedFullName &&
               true
@@ -91,6 +64,8 @@ const PersonalInfoScreen = () => {
             <Text className='font-semibold text-lg'>Save</Text>
           </TouchableOpacity>
         </View>
+
+        <Text>{fullName} ... {savedFullName}</Text>
 
         {/* Full Name field */}
         <Text className='mx-3 my-1 font-semibold text-lg'>Full Name</Text>
