@@ -1,6 +1,6 @@
 
 import React, { useEffect } from 'react';
-import { Text,TextInput,TouchableOpacity,View } from 'react-native';
+import { ActivityIndicator, Text,TextInput,TouchableOpacity,View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 
 import { useAuth, useUser } from '@clerk/clerk-expo'
@@ -33,7 +33,7 @@ const PersonalInfoScreen = () => {
   if (loadingData) {
     return (
       <View className='flex-1 items-center justify-center'>
-        <Text className='text-4xl'>Loading...</Text>
+        <ActivityIndicator size="large" />
       </View>
     )
   }
