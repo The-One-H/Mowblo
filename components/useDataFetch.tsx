@@ -4,6 +4,8 @@ import React, { useCallback, useEffect } from "react";
 
 interface UserData {
     fullName?: string,
+    isFreelancer: boolean,
+    isClient: boolean,
 }
 
 /**

@@ -20,7 +20,7 @@ const You = () => {
           <View className="w-14 h-14 rounded-full bg-gray-200 mr-4" />
           <View className="flex">
             <Text className="text-xl font-semibold">{userData?.fullName??''}</Text>
-            <Text className="text-gray-500">Freelancer & Client</Text>
+            <Text className="text-gray-500">{[(userData?.isFreelancer ? 'Freelancer' : ''), (userData?.isClient ? 'Client' : '')].filter((val) => val != '').join(' & ')}</Text>
           </View>
         </TouchableOpacity>
 
