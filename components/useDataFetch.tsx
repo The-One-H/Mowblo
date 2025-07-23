@@ -2,10 +2,14 @@ import { DatabaseQuery } from "@/firebaseConfig";
 import { useFocusEffect } from "expo-router";
 import React, { useCallback, useEffect } from "react";
 
+enum AccountType {
+    client = 'client',
+    freelancer = 'freelancer',
+}
+
 interface UserData {
     fullName?: string,
-    isFreelancer: boolean,
-    isClient: boolean,
+    accountType?: AccountType[]
 }
 
 /**
@@ -31,8 +35,6 @@ export const useDataFetch = (): [ UserData | undefined, boolean ] => {
                 databaseQuery.signIntoFirebaseWithClerk().then(() => {
                     databaseQuery.getFirestoreData(null, setData).then(() => {
                         setLoadingData(false);
-                        console.log('fetched:')
-                        console.log(data)
                     })
                 })
             }

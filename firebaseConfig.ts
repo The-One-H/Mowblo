@@ -77,8 +77,14 @@ class DatabaseQuery {
       if (typeof targets !== "undefined" && targets) {
         targets.forEach(target => {
           let current: any = docSnap.data()
-          target.key.split('.').forEach(val => {
+          target.key.split('.').every(val => {
+            
+            if (!(val in current)) {
+              current = null;
+              return false;
+            }
             current = current[val]
+            return true;
           });
           target.setters.forEach(setter => {
             setter(current);

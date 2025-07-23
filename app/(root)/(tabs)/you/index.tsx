@@ -5,6 +5,7 @@ import { Link, router } from 'expo-router';
 import { SignOutButton } from '@/components/SignOutButton';
 import { useDataFetch } from '@/components/useDataFetch';
 import { ProfileImage } from '@/components/ProfileImage';
+import { toTitleCase } from '@/utils/stringUtils';
 
 const You = () => {
   const [userData, _] = useDataFetch();
@@ -21,7 +22,7 @@ const You = () => {
           <ProfileImage className='w-14 h-14 mr-4'></ProfileImage>
           <View className="flex">
             <Text className="text-xl font-semibold">{userData?.fullName??''}</Text>
-            <Text className="text-gray-500">{[(userData?.isFreelancer ? 'Freelancer' : ''), (userData?.isClient ? 'Client' : '')].filter((val) => val != '').join(' & ')}</Text>
+            <Text className="text-gray-500">{userData?.accountType?.map((accType) => { return toTitleCase(accType); }).join(' & ')??''}</Text>
           </View>
         </TouchableOpacity>
 
