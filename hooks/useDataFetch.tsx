@@ -1,16 +1,7 @@
 import { DatabaseQuery } from "@/firebaseConfig";
 import { useFocusEffect } from "expo-router";
 import React, { useCallback, useEffect } from "react";
-
-enum AccountType {
-    client = 'client',
-    freelancer = 'freelancer',
-}
-
-interface UserData {
-    fullName?: string,
-    accountType?: AccountType[]
-}
+import type { UserData } from '@/types/userDataTypes'
 
 /**
  * Fetch all user data from the Firestore Database.

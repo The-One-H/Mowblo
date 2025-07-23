@@ -3,7 +3,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Link, router } from 'expo-router';
 import { SignOutButton } from '@/components/SignOutButton';
-import { useDataFetch } from '@/components/useDataFetch';
+import { useDataFetch } from '@/hooks/useDataFetch';
 import { ProfileImage } from '@/components/ProfileImage';
 import { toTitleCase } from '@/utils/stringUtils';
 
