@@ -124,7 +124,7 @@ class DatabaseQuery {
     }
 
     try {
-      const docRef = await setDoc(doc(db, 'users', this.userId), data)
+      const docRef = await setDoc(doc(db, 'users', this.userId), data, { merge: true })
     } catch (e) {
       console.error("Error adding document: ", e);
     }
