@@ -3,6 +3,7 @@ import { useClerk } from '@clerk/clerk-expo'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { useState } from 'react'
 import { Text, TouchableOpacity, Image, View, FlatList } from 'react-native'
+import { useClickOutside } from 'react-native-click-outside';
 
 const PulldownList = (
     {
@@ -20,10 +21,14 @@ const PulldownList = (
         setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
     }
 ) => {
+    const listRef = useClickOutside<View>(() => setIsOpen(false));
+    
     if (!valueMap) { return null; }
     return (
         <View
-            className={'flex-1 flex-row justify-between items-center border rounded-lg rounded-t-none m-0 p-3 bg-white border-slate-300 focus:border-slate-400'}
+            className={'animate-ping flex-1 flex-row justify-between items-center border rounded-lg rounded-t-none m-0 p-3 bg-white border-slate-300 focus:border-slate-400'}
+            collapsable={false}
+            ref={listRef}
         >
             <FlatList
                 scrollEnabled={false}
