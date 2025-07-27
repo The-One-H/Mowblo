@@ -1,11 +1,12 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { ColorSchemeName } from "react-native";
 
 enum AsyncStorageKey {
-    darkMode = 'darkMode'
+    colorScheme = 'colorScheme'
 }
 
 type AsyncStorageValue = {
-    [AsyncStorageKey.darkMode]: boolean
+    [AsyncStorageKey.colorScheme]: ColorSchemeName
 };
 
 const setData = async <K extends AsyncStorageKey>(key: AsyncStorageKey, value: AsyncStorageValue[K]) => {
