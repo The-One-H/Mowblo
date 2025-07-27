@@ -73,7 +73,7 @@ class DatabaseQuery {
     const docRef = doc(db, 'users', this.userId)
     const docSnap = await getDoc(docRef)
     if (docSnap.exists()) {
-      console.log('Document data:', docSnap.data())
+      // console.log('Document data:', docSnap.data())
       if (typeof targets !== "undefined" && targets) {
         targets.forEach(target => {
           let current: any = docSnap.data()
@@ -114,7 +114,7 @@ class DatabaseQuery {
     const userCredentials = await signInWithCustomToken(auth, token || '')
     // The userCredentials.user object can call the methods of
     // the Firebase platform as an authenticated user.
-    console.log('User:', userCredentials.user)
+    // console.log('User:', userCredentials.user)
   }, [])
 
   public writeFirestoreData = useCallback(async (data: any) => {
