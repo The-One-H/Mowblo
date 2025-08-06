@@ -2,18 +2,14 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import Feed from './feed';
-import Community from './community';
-import You from './you';
-import Wallet from './wallet';
-import Job from './job';
 
-const Tab = createBottomTabNavigator();
+import { Tabs } from 'expo-router';
+import { TouchableOpacity } from 'react-native';
 
 const TabsLayout = () => {
   return (
     <SafeAreaProvider>
-      <Tab.Navigator 
+      <Tabs
         screenOptions={({ route }) => ({ 
           headerShown: false,
           tabBarStyle: {
@@ -21,33 +17,47 @@ const TabsLayout = () => {
             borderTopRightRadius: 20,
             backgroundColor: 'black',
             position: 'absolute',
-
           },
-          tabBarIcon: ({ focused, color, size }) => {
-            let iconName: keyof typeof Ionicons.glyphMap = 'home';
-
-            if (route.name === 'Job') {
-              iconName = focused ? 'briefcase' : 'briefcase-outline';
-            } else if (route.name === 'Feed') {
-              iconName = focused ? 'newspaper' : 'newspaper-outline';
-            } else if (route.name === 'Community') {
-              iconName = focused ? 'people' : 'people-outline';
-            } else if (route.name === 'Wallet') {
-              iconName = focused ? 'wallet' : 'wallet-outline';
-            } else if (route.name === 'You') {
-              iconName = focused ? 'person-circle' : 'person-circle-outline';
-            }
-
-            return <Ionicons name={iconName} size={size} color={color} />;
-          },
+          animation: 'shift',
+          tabBarButton: (props) => <TouchableOpacity {...props} delayLongPress={100000} />,
         })}
       >
-        <Tab.Screen name="Job" component={Job} />
-        <Tab.Screen name="Feed" component={Feed} />
-        <Tab.Screen name="Community" component={Community} />
-        <Tab.Screen name="Wallet" component={Wallet} />
-        <Tab.Screen name="You" component={You} />
-      </Tab.Navigator>
+        <Tabs.Screen
+          name="job"
+          options={{
+            title: 'Job',
+            tabBarIcon: ({ focused, color, size }) => <Ionicons name={focused ? 'briefcase' : 'briefcase-outline'} size={size} color={color} />,
+          }}
+        />
+        <Tabs.Screen
+          name="feed"
+          options={{
+            title: 'Feed',
+            tabBarIcon: ({ focused, color, size }) => <Ionicons name={focused ? 'newspaper' : 'newspaper-outline'} size={size} color={color} />,
+          }}
+        />
+        <Tabs.Screen
+          name="community"
+          options={{
+            title: 'Community',
+            tabBarIcon: ({ focused, color, size }) => <Ionicons name={focused ? 'people' : 'people-outline'} size={size} color={color} />,
+          }}
+        />
+        <Tabs.Screen
+          name="wallet"
+          options={{
+            title: 'Wallet',
+            tabBarIcon: ({ focused, color, size }) => <Ionicons name={focused ? 'wallet' : 'wallet-outline'} size={size} color={color} />,
+          }}
+        />
+        <Tabs.Screen
+          name="you"
+          options={{
+            title: 'You',
+            tabBarIcon: ({ focused, color, size }) => <Ionicons name={focused ? 'person-circle' : 'person-circle-outline'} size={size} color={color} />,
+          }}
+        />
+      </Tabs>
     </SafeAreaProvider>
   );
 };

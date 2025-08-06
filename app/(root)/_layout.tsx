@@ -13,7 +13,7 @@ export default function RootLayout() {
     <>
       <SignedIn>
         <Stack screenOptions={{headerShown: false}}>
-          <Stack.Screen name = "(tabs)"/>
+          <Stack.Screen name="(tabs)"/>
         </Stack>
       </SignedIn>
       <SignedOut>
