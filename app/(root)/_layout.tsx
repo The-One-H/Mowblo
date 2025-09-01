@@ -7,7 +7,6 @@ import { TouchableOpacity, Text } from "react-native";
 
 export default function RootLayout() {
   const { userId, sessionId, getToken, isLoaded, isSignedIn } = useAuth();
-  const router = useRouter()
 
   return (
     <>

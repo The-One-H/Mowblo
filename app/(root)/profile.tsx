@@ -7,7 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 const Profile = () => {
   return (
     <SafeAreaView>
-        <Link href= {"/(root)/(tabs)/home"}>
+        <Link href= {"/(root)/(tabs)/job"}>
         <Ionicons name="chevron-back" size={20} color="#666" />
       <Text>Profile</Text>
         </Link>

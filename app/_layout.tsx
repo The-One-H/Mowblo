@@ -7,7 +7,6 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import "../global.css"
 import { ClickOutsideProvider } from "react-native-click-outside";
 
-
 export default function AppLayout() {
   return (
     <ClerkProvider tokenCache={tokenCache}>
@@ -19,6 +18,8 @@ export default function AppLayout() {
             <Stack.Screen name = "(auth)"/>
             <Stack.Screen name = "(legal)"/>
             <Stack.Screen name = "(root)"/>
+            <Stack.Screen name="job-tracking" options={{ headerShown: false }} />
+            <Stack.Screen name="job-inbox" options={{ headerShown: false }} />
             <Stack.Screen name=" +not-found"/>
             <Stack.Screen name=" +html"/>
             <Stack.Screen name=" index"/>

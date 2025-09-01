@@ -1,3 +1,4 @@
+import React from 'react';
 import { Redirect, Stack } from 'expo-router'
 import { useAuth } from '@clerk/clerk-expo'
 
@@ -10,9 +11,11 @@ export default function AuthRoutesLayout() {
 
     const { isSignedIn } = useAuth()
 
-    if (isSignedIn) {
-        router.replace('/(root)/(tabs)/feed');
-    }
+    React.useEffect(() => {
+        if (isSignedIn) {
+            router.replace('/(root)/(tabs)/feed');
+        }
+    }, [isSignedIn, router]);
 
     return (
         <Stack screenOptions={{headerShown: false}}>
