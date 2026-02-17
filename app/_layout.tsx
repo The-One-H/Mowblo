@@ -12,17 +12,19 @@ export default function AppLayout() {
     <ClerkProvider tokenCache={tokenCache}>
       <ClickOutsideProvider>
         <GestureHandlerRootView style={{ flex: 1 }}>
-          <StatusBar style="dark"/>
-          <Stack screenOptions={{headerShown: false}}>
-            <Stack.Screen name = "(api)"/>
-            <Stack.Screen name = "(auth)"/>
-            <Stack.Screen name = "(legal)"/>
-            <Stack.Screen name = "(root)"/>
+          <StatusBar style="dark" />
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="(api)" />
+            <Stack.Screen name="(auth)" />
+            <Stack.Screen name="(customer)" />
+            <Stack.Screen name="(pro)" />
+            <Stack.Screen name="(legal)" />
+            <Stack.Screen name="(root)" />
             <Stack.Screen name="job-tracking" options={{ headerShown: false }} />
             <Stack.Screen name="job-inbox" options={{ headerShown: false }} />
-            <Stack.Screen name=" +not-found"/>
-            <Stack.Screen name=" +html"/>
-            <Stack.Screen name=" index"/>
+            <Stack.Screen name=" +not-found" />
+            <Stack.Screen name=" +html" />
+            <Stack.Screen name=" index" />
           </Stack>
         </GestureHandlerRootView>
       </ClickOutsideProvider>
