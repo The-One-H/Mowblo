@@ -1,14 +1,14 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  Image, 
-  TouchableOpacity, 
-  TextInput, 
-  Dimensions, 
-  StatusBar, 
-  Alert, 
-  Animated, 
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  TextInput,
+  Dimensions,
+  StatusBar,
+  Alert,
+  Animated,
   FlatList,
   ScrollView,
   KeyboardAvoidingView,
@@ -16,7 +16,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import MapView, { Marker, PROVIDER_GOOGLE, Region } from 'react-native-maps';
+import MapView, { Marker, Region } from 'react-native-maps';
 import { Modalize } from 'react-native-modalize';
 import { useRouter } from 'expo-router';
 
@@ -200,12 +200,12 @@ import { addJobToTracking, getAcceptedJobs } from '../../job-tracking';
 
 export default function JobScreen() {
   const router = useRouter();
-  
+
   const modalRef = useRef<Modalize>(null);
   const searchInputRef = useRef<TextInput>(null);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
-  
+
   const [isJobAccepted, setIsJobAccepted] = useState(false);
   const [isJobSaved, setIsJobSaved] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -241,16 +241,16 @@ export default function JobScreen() {
   // Filter jobs based on search query
   useEffect(() => {
     let filtered = sampleJobs;
-    
+
     if (searchQuery.trim()) {
-      filtered = filtered.filter(job => 
+      filtered = filtered.filter(job =>
         job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         job.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
         job.address.fullAddress.toLowerCase().includes(searchQuery.toLowerCase()) ||
         job.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
       );
     }
-    
+
     setFilteredJobs(filtered);
   }, [searchQuery]);
 
@@ -259,12 +259,12 @@ export default function JobScreen() {
     if (filteredJobs.length > 0) {
       const latitudes = filteredJobs.map(job => job.location.latitude);
       const longitudes = filteredJobs.map(job => job.location.longitude);
-      
+
       const minLat = Math.min(...latitudes);
       const maxLat = Math.max(...latitudes);
       const minLng = Math.min(...longitudes);
       const maxLng = Math.max(...longitudes);
-      
+
       setMapRegion({
         latitude: (minLat + maxLat) / 2,
         longitude: (minLng + maxLng) / 2,
@@ -283,14 +283,14 @@ export default function JobScreen() {
   // Handle job acceptance
   const handleAcceptJob = () => {
     if (!selectedJob) return;
-    
+
     Alert.alert(
       'Accept Job',
       `Are you sure you want to accept this ${selectedJob.title} job for $${selectedJob.price}?`,
       [
         { text: 'Cancel', style: 'cancel' },
-        { 
-          text: 'Accept', 
+        {
+          text: 'Accept',
           onPress: () => {
             // Create job tracking entry
             const newJobTracking: JobTracking = {
@@ -300,18 +300,18 @@ export default function JobScreen() {
               acceptedAt: new Date().toISOString(),
               job: selectedJob
             };
-            
-                         addJobToTracking(newJobTracking);
-            
-                         // Navigate to job tracking modal
+
+            addJobToTracking(newJobTracking);
+
+            // Navigate to job tracking modal
             router.push({
               pathname: '/job-tracking',
-              params: { 
+              params: {
                 trackingId: newJobTracking.id,
                 jobId: selectedJob.id
               }
             });
-            
+
             modalRef.current?.close();
           }
         }
@@ -387,11 +387,11 @@ export default function JobScreen() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#000' }}>
       <StatusBar translucent backgroundColor="transparent" barStyle="light-content" />
-      
+
       {/* Modern Map */}
       <View style={{ flex: 1 }}>
         <MapView
-          provider={PROVIDER_GOOGLE}
+
           style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, width: '100%', height: '100%' }}
           region={mapRegion}
           showsUserLocation={true}
@@ -407,7 +407,7 @@ export default function JobScreen() {
               coordinate={job.location}
               onPress={() => openModal(job)}
             >
-              <Animated.View 
+              <Animated.View
                 className="items-center"
                 style={{
                   opacity: fadeAnim,
@@ -418,10 +418,10 @@ export default function JobScreen() {
                   <Ionicons name="location" size={28} color="#3B82F6" />
                 </View>
                 <View className={`rounded-full p-2 mt-1 shadow-md ${getUrgencyColor(job.urgency)}`}>
-                  <Ionicons 
-                    name={getCategoryIcon(job.category) as any} 
-                    size={14} 
-                    color="white" 
+                  <Ionicons
+                    name={getCategoryIcon(job.category) as any}
+                    size={14}
+                    color="white"
                   />
                 </View>
               </Animated.View>
@@ -430,7 +430,7 @@ export default function JobScreen() {
         </MapView>
 
         {/* Job Inbox Button */}
-        <Animated.View 
+        <Animated.View
           className="absolute top-20 left-4 z-20"
           style={{
             opacity: fadeAnim,
@@ -451,9 +451,9 @@ export default function JobScreen() {
         </Animated.View>
 
         {/* Modern Search Bar */}
-        <Animated.View 
-          className="absolute left-0 w-full px-4 z-20" 
-          style={{ 
+        <Animated.View
+          className="absolute left-0 w-full px-4 z-20"
+          style={{
             bottom: 120,
             opacity: fadeAnim,
             transform: [{ translateY: slideAnim }]
@@ -478,7 +478,7 @@ export default function JobScreen() {
               />
             </View>
             {searchQuery.length > 0 && (
-              <TouchableOpacity 
+              <TouchableOpacity
                 className="ml-3 p-2 rounded-full bg-gray-100"
                 onPress={clearSearch}
               >
@@ -491,7 +491,7 @@ export default function JobScreen() {
 
 
         {/* Job Count Badge */}
-        <Animated.View 
+        <Animated.View
           className="absolute top-20 right-4 z-20"
           style={{
             opacity: fadeAnim,
@@ -509,8 +509,8 @@ export default function JobScreen() {
         {selectedJob && (
           <Animated.View
             className="absolute left-0 right-0 z-30 px-4"
-            style={{ 
-              bottom: 280, 
+            style={{
+              bottom: 280,
               elevation: 20,
               opacity: fadeAnim,
               transform: [{ translateY: slideAnim }]
@@ -571,39 +571,39 @@ export default function JobScreen() {
           snapPoint={400}
           modalHeight={height * 0.75}
           handlePosition="inside"
-          modalStyle={{ 
-            borderTopLeftRadius: 32, 
-            borderTopRightRadius: 32, 
-            paddingHorizontal: 24, 
-            paddingTop: 28, 
-            backgroundColor: 'white', 
-            shadowColor: '#000', 
-            shadowOffset: { width: 0, height: -8 }, 
-            shadowOpacity: 0.15, 
-            shadowRadius: 24, 
-            elevation: 30 
+          modalStyle={{
+            borderTopLeftRadius: 32,
+            borderTopRightRadius: 32,
+            paddingHorizontal: 24,
+            paddingTop: 28,
+            backgroundColor: 'white',
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: -8 },
+            shadowOpacity: 0.15,
+            shadowRadius: 24,
+            elevation: 30
           }}
-          handleStyle={{ 
-            marginTop: 12, 
-            marginBottom: 12, 
-            backgroundColor: '#D1D5DB', 
-            width: 56, 
-            height: 6, 
-            borderRadius: 3, 
-            alignSelf: 'center' 
+          handleStyle={{
+            marginTop: 12,
+            marginBottom: 12,
+            backgroundColor: '#D1D5DB',
+            width: 56,
+            height: 6,
+            borderRadius: 3,
+            alignSelf: 'center'
           }}
           withHandle
           panGestureEnabled
           closeOnOverlayTap
           disableScrollIfPossible
-          openAnimationConfig={{ 
-            timing: { duration: 350, easing: (t) => t }, 
-            spring: { speed: 20, bounciness: 8 } 
+          openAnimationConfig={{
+            timing: { duration: 350, easing: (t) => t },
+            spring: { speed: 20, bounciness: 8 }
           }}
           overlayStyle={{ backgroundColor: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(12px)' }}
         >
           {selectedJob && (
-            <KeyboardAvoidingView 
+            <KeyboardAvoidingView
               behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
               style={{ paddingBottom: 24 }}
             >
@@ -621,7 +621,7 @@ export default function JobScreen() {
                       </View>
                     </View>
                   </View>
-                  <TouchableOpacity 
+                  <TouchableOpacity
                     onPress={() => modalRef.current?.close()}
                     className="p-2 rounded-full bg-gray-100"
                   >
@@ -684,7 +684,7 @@ export default function JobScreen() {
 
                 {/* Action Buttons */}
                 <View className="flex-row space-x-3 mb-6">
-                  <TouchableOpacity 
+                  <TouchableOpacity
                     className={`flex-1 py-4 rounded-2xl ${isJobAccepted ? 'bg-green-100' : 'bg-black'}`}
                     onPress={handleAcceptJob}
                     disabled={isJobAccepted}
@@ -693,15 +693,15 @@ export default function JobScreen() {
                       {isJobAccepted ? 'Job Accepted ✓' : 'Accept Job'}
                     </Text>
                   </TouchableOpacity>
-                  
-                  <TouchableOpacity 
+
+                  <TouchableOpacity
                     className={`p-4 rounded-2xl ${isJobSaved ? 'bg-blue-100' : 'bg-gray-100'}`}
                     onPress={handleSaveJob}
                   >
-                    <Ionicons 
-                      name={isJobSaved ? "heart" : "heart-outline"} 
-                      size={24} 
-                      color={isJobSaved ? "#3B82F6" : "#6B7280"} 
+                    <Ionicons
+                      name={isJobSaved ? "heart" : "heart-outline"}
+                      size={24}
+                      color={isJobSaved ? "#3B82F6" : "#6B7280"}
                     />
                   </TouchableOpacity>
                 </View>

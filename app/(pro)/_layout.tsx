@@ -1,66 +1,46 @@
-import { Tabs } from "expo-router";
-import React from "react";
-import { Colors } from "../../constants/theme";
-import { Ionicons } from "@expo/vector-icons";
+import React, { useState } from 'react';
+import { View, StyleSheet } from 'react-native';
+import { Slot, useRouter, usePathname } from 'expo-router';
+import FloatingTabBar from '../../components/ui/FloatingTabBar';
+import { Colors } from '../../constants/theme';
+
+const PRO_TABS = [
+    { name: 'dashboard', icon: 'grid-outline', iconFocused: 'grid' },
+    { name: 'earnings', icon: 'wallet-outline', iconFocused: 'wallet' },
+    { name: 'account', icon: 'person-outline', iconFocused: 'person' },
+];
 
 export default function ProLayout() {
+    const router = useRouter();
+    const pathname = usePathname();
+
+    const getActiveIndex = () => {
+        if (pathname.includes('/earnings')) return 1;
+        if (pathname.includes('/pro-account')) return 2;
+        return 0;
+    };
+
+    const handleTabPress = (index: number) => {
+        const routes = ['/(pro)/dashboard', '/(pro)/earnings', '/(pro)/pro-account'];
+        router.push(routes[index] as any);
+    };
+
     return (
-        <Tabs
-            screenOptions={{
-                headerShown: false,
-                tabBarActiveTintColor: Colors.primary.green, // Pro mode uses green
-                tabBarInactiveTintColor: Colors.text.grayMid,
-                tabBarStyle: {
-                    backgroundColor: Colors.background.surface,
-                    borderTopColor: Colors.background.grayLight,
-                },
-            }}
-        >
-            <Tabs.Screen
-                name="dashboard"
-                options={{
-                    title: "Dashboard",
-                    tabBarIcon: ({ color, size }) => (
-                        <Ionicons name="stats-chart" size={size} color={color} />
-                    ),
-                }}
+        <View style={styles.container}>
+            <Slot />
+            <FloatingTabBar
+                tabs={PRO_TABS}
+                activeIndex={getActiveIndex()}
+                onTabPress={handleTabPress}
+                accentColor={Colors.primary.green}
             />
-            <Tabs.Screen
-                name="jobs"
-                options={{
-                    title: "Jobs",
-                    tabBarIcon: ({ color, size }) => (
-                        <Ionicons name="briefcase" size={size} color={color} />
-                    ),
-                }}
-            />
-            <Tabs.Screen
-                name="earnings"
-                options={{
-                    title: "Earnings",
-                    tabBarIcon: ({ color, size }) => (
-                        <Ionicons name="cash" size={size} color={color} />
-                    ),
-                }}
-            />
-            <Tabs.Screen
-                name="schedule"
-                options={{
-                    title: "Schedule",
-                    tabBarIcon: ({ color, size }) => (
-                        <Ionicons name="calendar" size={size} color={color} />
-                    ),
-                }}
-            />
-            <Tabs.Screen
-                name="profile-pro"
-                options={{
-                    title: "Profile",
-                    tabBarIcon: ({ color, size }) => (
-                        <Ionicons name="person-circle" size={size} color={color} />
-                    ),
-                }}
-            />
-        </Tabs>
+        </View>
     );
 }
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#0D1117',
+    },
+});

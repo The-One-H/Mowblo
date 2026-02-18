@@ -1,122 +1,231 @@
-import { View, Text, ScrollView, TouchableOpacity, Image } from "react-native";
-import React from "react";
-import { Colors } from "../../constants/theme";
-import { Ionicons } from "@expo/vector-icons";
-import { SafeAreaView } from "react-native-safe-area-context";
+import React from 'react';
+import {
+    View,
+    Text,
+    ScrollView,
+    TouchableOpacity,
+    StyleSheet,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { StatusBar } from 'expo-status-bar';
+import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+import { useAuth, useUser } from '@clerk/clerk-expo';
+import Animated, { FadeInDown } from 'react-native-reanimated';
+import { useStore } from '../../store/useStore';
+import { useJobs } from '../../services/firebase';
+import { Colors } from '../../constants/theme';
 
 export default function CustomerHome() {
+    const router = useRouter();
+    const { user } = useUser();
+    const { userId } = useAuth();
+    const { activeService, setActiveService } = useStore();
+    const { jobs: pendingJobs } = useJobs('customer', userId, ['posted']);
+    const { jobs: activeJobs } = useJobs('customer', userId, ['accepted', 'in_progress']);
+    const { jobs: completedJobs } = useJobs('customer', userId, ['completed']);
+
+    const firstName = user?.firstName || 'there';
+
     return (
-        <SafeAreaView className="flex-1 bg-surface">
-            <ScrollView className="flex-1 p-6">
+        <View style={styles.container}>
+            <StatusBar style="dark" />
+            <ScrollView
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={{ paddingBottom: 120 }}
+            >
                 {/* Header */}
-                <View className="flex-row justify-between items-center mb-8">
-                    <View>
-                        <Text className="text-gray-mid font-body text-base">
-                            👋 Hey Marcus,
-                        </Text>
-                        <View className="flex-row items-center">
-                            <Text className="text-dark font-headline text-lg mr-1">
-                                42 Maple Drive
-                            </Text>
-                            <Ionicons name="chevron-down" size={16} color={Colors.text.dark} />
-                        </View>
-                    </View>
-                    <Image
-                        source={{ uri: "https://i.pravatar.cc/100" }}
-                        className="w-10 h-10 rounded-full bg-gray-300"
-                    />
-                </View>
-
-                {/* Search Bar */}
-                <View className="bg-white rounded-xl p-4 flex-row items-center shadow-sm mb-6">
-                    <Ionicons name="search" size={20} color={Colors.text.grayMid} />
-                    <Text className="text-gray-mid ml-2 font-body">
-                        What do you need today?
-                    </Text>
-                </View>
-
-                {/* Seasonal Alert Banner */}
-                <View
-                    className="rounded-2xl p-6 mb-8 relative overflow-hidden"
-                    style={{ backgroundColor: Colors.primary.blue }}
-                >
-                    <View className="flex-row items-start justify-between relative z-10">
-                        <View className="flex-1 mr-4">
-                            <View className="flex-row items-center mb-2">
-                                <Ionicons name="snow" size={20} color="white" />
-                                <Text className="text-white font-headline ml-2">SNOW ALERT</Text>
-                            </View>
-                            <Text className="text-white font-display text-2xl mb-2">
-                                8-12" expected tonight
-                            </Text>
-                            <Text className="text-white font-body opacity-90 mb-4">
-                                Book a Pro now before they fill up!
-                            </Text>
-                            <TouchableOpacity
-                                className="bg-white px-6 py-3 rounded-full self-start"
-                            >
-                                <Text className="text-primary-blue font-headline">Book Now →</Text>
+                <SafeAreaView edges={['top']}>
+                    <View style={styles.header}>
+                        <View>
+                            <Text style={styles.greeting}>Hey {firstName} 👋</Text>
+                            <TouchableOpacity style={styles.addressRow}>
+                                <Ionicons name="location" size={16} color={Colors.primary.blue} />
+                                <Text style={styles.addressText}>Set your address</Text>
+                                <Ionicons name="chevron-down" size={14} color="#8E99A4" />
                             </TouchableOpacity>
                         </View>
-                        <Ionicons
-                            name="snow"
-                            size={120}
-                            color="white"
-                            style={{ opacity: 0.2, position: "absolute", right: -20, top: -20 }}
-                        />
+                        <TouchableOpacity
+                            style={styles.avatarButton}
+                            onPress={() => router.push('/(customer)/account')}
+                        >
+                            <View style={styles.avatarBg}>
+                                <Text style={styles.avatarText}>
+                                    {firstName[0]?.toUpperCase() || 'M'}
+                                </Text>
+                            </View>
+                        </TouchableOpacity>
                     </View>
-                </View>
+                </SafeAreaView>
 
-                {/* Service Selector */}
-                <Text className="text-dark font-headline text-xl mb-4">Services</Text>
-                <View className="flex-row gap-4 mb-8">
-                    {/* Lawn Card */}
-                    <TouchableOpacity className="flex-1 bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-                        <View
-                            className="w-12 h-12 rounded-full items-center justify-center mb-4"
-                            style={{ backgroundColor: "#E6F6E2" }}
-                        >
-                            <Ionicons name="leaf" size={24} color={Colors.primary.green} />
-                        </View>
-                        <Text className="text-dark font-headline text-lg mb-1">
-                            Lawn Mowing
-                        </Text>
-                        <Text className="text-gray-mid text-xs mb-4">From $35</Text>
-                        <View className="flex-row items-center mb-4">
-                            <View className="w-2 h-2 rounded-full bg-green-500 mr-2" />
-                            <Text className="text-green-600 text-xs font-bold">
-                                12 Pros near
+                {/* Seasonal Banner */}
+                <Animated.View entering={FadeInDown.delay(100).duration(400)}>
+                    <View style={[styles.alertBanner, { backgroundColor: activeService === 'snow' ? '#EEF6FB' : '#F0F9EC' }]}>
+                        <Text style={styles.alertEmoji}>{activeService === 'snow' ? '❄️' : '🌿'}</Text>
+                        <View style={{ flex: 1 }}>
+                            <Text style={styles.alertTitle}>
+                                {activeService === 'snow' ? 'Snow season is here!' : 'Perfect mowing weather!'}
+                            </Text>
+                            <Text style={styles.alertSub}>
+                                {activeService === 'snow' ? 'Book a Pro before they fill up.' : 'Keep your lawn fresh.'}
                             </Text>
                         </View>
-                        <View className="bg-surface py-2 rounded-lg items-center">
-                            <Text className="text-dark font-bold text-sm">Book</Text>
-                        </View>
-                    </TouchableOpacity>
-
-                    {/* Snow Card */}
-                    <TouchableOpacity className="flex-1 bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-                        <View
-                            className="w-12 h-12 rounded-full items-center justify-center mb-4"
-                            style={{ backgroundColor: "#E2F2F9" }}
+                        <TouchableOpacity
+                            style={[styles.alertBtn, { backgroundColor: activeService === 'snow' ? Colors.primary.blue : Colors.primary.green }]}
+                            onPress={() => router.push('/(customer)/create-job')}
                         >
-                            <Ionicons name="snow" size={24} color={Colors.primary.blue} />
+                            <Text style={styles.alertBtnText}>Book</Text>
+                        </TouchableOpacity>
+                    </View>
+                </Animated.View>
+
+                {/* Service Cards */}
+                <Animated.View entering={FadeInDown.delay(200).duration(400)} style={styles.section}>
+                    <Text style={styles.sectionTitle}>What do you need?</Text>
+                    <View style={styles.serviceCards}>
+                        <TouchableOpacity
+                            activeOpacity={0.85}
+                            onPress={() => { setActiveService('lawn'); router.push('/(customer)/create-job'); }}
+                            style={[styles.serviceCard, { backgroundColor: '#F0F9EC' }]}
+                        >
+                            <View style={[styles.serviceIcon, { backgroundColor: '#5BAA48' }]}>
+                                <Ionicons name="leaf" size={24} color="#fff" />
+                            </View>
+                            <Text style={styles.serviceName}>Lawn{'\n'}Mowing</Text>
+                            <Text style={styles.servicePrice}>From $35</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                            activeOpacity={0.85}
+                            onPress={() => { setActiveService('snow'); router.push('/(customer)/create-job'); }}
+                            style={[styles.serviceCard, { backgroundColor: '#EEF6FB' }]}
+                        >
+                            <View style={[styles.serviceIcon, { backgroundColor: '#4A9EC4' }]}>
+                                <Ionicons name="snow" size={24} color="#fff" />
+                            </View>
+                            <Text style={styles.serviceName}>Snow{'\n'}Removal</Text>
+                            <Text style={styles.servicePrice}>From $45</Text>
+                        </TouchableOpacity>
+                    </View>
+                </Animated.View>
+
+                {/* Active Jobs */}
+                {activeJobs.length > 0 && (
+                    <Animated.View entering={FadeInDown.delay(300).duration(400)} style={styles.section}>
+                        <Text style={styles.sectionTitle}>In Progress</Text>
+                        {activeJobs.map((job) => (
+                            <View key={job.id} style={styles.jobCard}>
+                                <View style={[styles.statusDot, { backgroundColor: '#F6AD55' }]} />
+                                <View style={{ flex: 1 }}>
+                                    <Text style={styles.jobTitle}>{job.title}</Text>
+                                    <Text style={styles.jobSub}>{job.location.address} · {job.status}</Text>
+                                </View>
+                                <Text style={styles.jobPrice}>${job.price}</Text>
+                            </View>
+                        ))}
+                    </Animated.View>
+                )}
+
+                {/* Pending Jobs */}
+                {pendingJobs.length > 0 && (
+                    <Animated.View entering={FadeInDown.delay(350).duration(400)} style={styles.section}>
+                        <Text style={styles.sectionTitle}>Pending ({pendingJobs.length})</Text>
+                        {pendingJobs.map((job) => (
+                            <View key={job.id} style={styles.jobCard}>
+                                <View style={[styles.statusDot, { backgroundColor: '#63B3ED' }]} />
+                                <View style={{ flex: 1 }}>
+                                    <Text style={styles.jobTitle}>{job.title}</Text>
+                                    <Text style={styles.jobSub}>{job.location.address}</Text>
+                                </View>
+                                <Text style={styles.jobPrice}>${job.price}</Text>
+                            </View>
+                        ))}
+                    </Animated.View>
+                )}
+
+                {/* Completed Jobs */}
+                {completedJobs.length > 0 && (
+                    <Animated.View entering={FadeInDown.delay(400).duration(400)} style={styles.section}>
+                        <Text style={styles.sectionTitle}>Completed</Text>
+                        {completedJobs.slice(0, 3).map((job) => (
+                            <View key={job.id} style={styles.jobCard}>
+                                <View style={[styles.statusDot, { backgroundColor: '#68D391' }]} />
+                                <View style={{ flex: 1 }}>
+                                    <Text style={styles.jobTitle}>{job.title}</Text>
+                                    <Text style={styles.jobSub}>{job.location.address}</Text>
+                                </View>
+                                <Text style={styles.jobPrice}>${job.price}</Text>
+                            </View>
+                        ))}
+                    </Animated.View>
+                )}
+
+                {/* Empty state if no jobs */}
+                {pendingJobs.length === 0 && activeJobs.length === 0 && completedJobs.length === 0 && (
+                    <Animated.View entering={FadeInDown.delay(300).duration(400)} style={styles.section}>
+                        <View style={styles.emptyCard}>
+                            <Ionicons name="sparkles-outline" size={32} color="#8E99A4" />
+                            <Text style={styles.emptyTitle}>No jobs yet</Text>
+                            <Text style={styles.emptySub}>Tap the + button to post your first job!</Text>
                         </View>
-                        <Text className="text-dark font-headline text-lg mb-1">
-                            Snow Removal
-                        </Text>
-                        <Text className="text-gray-mid text-xs mb-4">From $45</Text>
-                        <View className="flex-row items-center mb-4">
-                            <View className="w-2 h-2 rounded-full bg-blue-500 mr-2" />
-                            <Text className="text-blue-600 text-xs font-bold">
-                                8 Pros avail
-                            </Text>
-                        </View>
-                        <View className="bg-surface py-2 rounded-lg items-center">
-                            <Text className="text-dark font-bold text-sm">Book</Text>
-                        </View>
-                    </TouchableOpacity>
-                </View>
+                    </Animated.View>
+                )}
             </ScrollView>
-        </SafeAreaView>
+        </View>
     );
 }
+
+const styles = StyleSheet.create({
+    container: { flex: 1, backgroundColor: '#F5F8FA' },
+    header: {
+        flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
+        paddingHorizontal: 20, paddingTop: 8, paddingBottom: 12,
+    },
+    greeting: { fontSize: 28, fontWeight: '800', color: '#1A2332', letterSpacing: -0.5 },
+    addressRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4 },
+    addressText: { fontSize: 14, color: '#8E99A4', fontWeight: '500' },
+    avatarButton: { marginLeft: 'auto' },
+    avatarBg: {
+        width: 44, height: 44, borderRadius: 22,
+        backgroundColor: '#1A2332', alignItems: 'center', justifyContent: 'center',
+    },
+    avatarText: { color: '#FFFFFF', fontSize: 18, fontWeight: '700' },
+    alertBanner: {
+        marginHorizontal: 20, borderRadius: 16, flexDirection: 'row',
+        alignItems: 'center', padding: 16, gap: 12,
+    },
+    alertEmoji: { fontSize: 28 },
+    alertTitle: { fontSize: 15, fontWeight: '700', color: '#1A2332' },
+    alertSub: { fontSize: 12, color: '#8E99A4', marginTop: 2 },
+    alertBtn: {
+        paddingHorizontal: 16, paddingVertical: 8, borderRadius: 12,
+    },
+    alertBtnText: { color: '#FFFFFF', fontWeight: '700', fontSize: 14 },
+    section: { paddingHorizontal: 20, marginTop: 20 },
+    sectionTitle: { fontSize: 20, fontWeight: '700', color: '#1A2332', marginBottom: 14 },
+    serviceCards: { flexDirection: 'row', gap: 14 },
+    serviceCard: {
+        flex: 1, borderRadius: 20, padding: 18, minHeight: 170, justifyContent: 'space-between',
+    },
+    serviceIcon: {
+        width: 48, height: 48, borderRadius: 14, alignItems: 'center', justifyContent: 'center',
+    },
+    serviceName: { fontSize: 19, fontWeight: '800', color: '#1A2332', marginTop: 12, letterSpacing: -0.3 },
+    servicePrice: { fontSize: 14, fontWeight: '600', color: '#1A2332', marginTop: 4 },
+    jobCard: {
+        backgroundColor: '#FFFFFF', borderRadius: 16, padding: 16,
+        flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 10,
+        shadowColor: '#000', shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.04, shadowRadius: 6, elevation: 2,
+    },
+    statusDot: { width: 10, height: 10, borderRadius: 5 },
+    jobTitle: { fontSize: 15, fontWeight: '700', color: '#1A2332' },
+    jobSub: { fontSize: 12, color: '#8E99A4', marginTop: 2 },
+    jobPrice: { fontSize: 16, fontWeight: '800', color: '#1A2332' },
+    emptyCard: {
+        backgroundColor: '#FFFFFF', borderRadius: 20, padding: 32,
+        alignItems: 'center', gap: 8,
+    },
+    emptyTitle: { fontSize: 16, fontWeight: '700', color: '#1A2332' },
+    emptySub: { fontSize: 13, color: '#8E99A4', textAlign: 'center' },
+});

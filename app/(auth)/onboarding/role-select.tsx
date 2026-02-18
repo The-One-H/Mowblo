@@ -1,52 +1,173 @@
-import { View, Text, TouchableOpacity, Image } from "react-native";
-import React from "react";
-import { useRouter } from "expo-router";
-import { Colors } from "../../../constants/theme";
-import { Ionicons } from "@expo/vector-icons";
+import React from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import { useRouter } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
+import Animated, { FadeInDown } from 'react-native-reanimated';
+import { useUserProfile } from '../../../services/firebase';
+import { useStore } from '../../../store/useStore';
+
+const { width } = Dimensions.get('window');
 
 export default function RoleSelect() {
     const router = useRouter();
+    const { createProfile } = useUserProfile();
+    const { setUserRole } = useStore();
+
+    const selectRole = async (role: 'customer' | 'pro') => {
+        setUserRole(role);
+        await createProfile({ role });
+
+        if (role === 'pro') {
+            router.push('/(auth)/onboarding/pro-onboarding');
+        } else {
+            router.replace('/(customer)/home');
+        }
+    };
 
     return (
-        <View className="flex-1 bg-dark items-center justify-center p-6">
-            <Text className="text-white text-3xl font-display mb-2 text-center">
-                Welcome to Mowblo
-            </Text>
-            <Text className="text-gray-mid text-lg font-body mb-12 text-center">
-                How do you want to use the app?
-            </Text>
+        <View style={styles.container}>
+            <SafeAreaView style={styles.safeArea}>
+                {/* Header */}
+                <Animated.View entering={FadeInDown.delay(100).duration(400)} style={styles.header}>
+                    <Text style={styles.title}>How will you use{'\n'}Mowblo?</Text>
+                    <Text style={styles.subtitle}>You can always switch later</Text>
+                </Animated.View>
 
-            <View className="flex-row w-full gap-4">
-                {/* Customer Card */}
-                <TouchableOpacity
-                    className="flex-1 bg-primary-blue rounded-2xl p-6 items-center"
-                    onPress={() => router.push("/(customer)/home")}
-                    style={{ backgroundColor: Colors.primary.blue }}
-                >
-                    <Ionicons name="home" size={48} color="white" />
-                    <Text className="text-white font-headline text-xl mt-4">
-                        I need help
-                    </Text>
-                    <Text className="text-white font-body text-center mt-2 opacity-90">
-                        Book a Pro for lawn or snow
-                    </Text>
-                </TouchableOpacity>
+                {/* Role Cards */}
+                <View style={styles.cards}>
+                    {/* Customer Card */}
+                    <Animated.View entering={FadeInDown.delay(200).duration(400)}>
+                        <TouchableOpacity
+                            activeOpacity={0.85}
+                            onPress={() => selectRole('customer')}
+                            style={styles.card}
+                        >
+                            <View style={[styles.iconBg, { backgroundColor: '#EEF6FB' }]}>
+                                <Ionicons name="home" size={36} color="#4A9EC4" />
+                            </View>
+                            <View style={styles.cardContent}>
+                                <Text style={styles.cardTitle}>I need help</Text>
+                                <Text style={styles.cardSub}>
+                                    Book a Pro for lawn mowing{'\n'}or snow removal
+                                </Text>
+                            </View>
+                            <Ionicons name="chevron-forward" size={22} color="#C4CDD5" />
+                        </TouchableOpacity>
+                    </Animated.View>
 
-                {/* Pro Card */}
-                <TouchableOpacity
-                    className="flex-1 bg-primary-green rounded-2xl p-6 items-center"
-                    onPress={() => router.push("/(pro)/dashboard")}
-                    style={{ backgroundColor: Colors.primary.green }}
-                >
-                    <Ionicons name="construct" size={48} color="white" />
-                    <Text className="text-white font-headline text-xl mt-4">
-                        I want to earn
+                    {/* Pro Card */}
+                    <Animated.View entering={FadeInDown.delay(350).duration(400)}>
+                        <TouchableOpacity
+                            activeOpacity={0.85}
+                            onPress={() => selectRole('pro')}
+                            style={styles.card}
+                        >
+                            <View style={[styles.iconBg, { backgroundColor: '#F0F9EC' }]}>
+                                <Ionicons name="construct" size={36} color="#5BAA48" />
+                            </View>
+                            <View style={styles.cardContent}>
+                                <Text style={styles.cardTitle}>I want to earn</Text>
+                                <Text style={styles.cardSub}>
+                                    Make money on your own{'\n'}schedule as a Pro
+                                </Text>
+                            </View>
+                            <Ionicons name="chevron-forward" size={22} color="#C4CDD5" />
+                        </TouchableOpacity>
+                    </Animated.View>
+                </View>
+
+                {/* Footer */}
+                <Animated.View entering={FadeInDown.delay(500).duration(400)} style={styles.footer}>
+                    <Text style={styles.footerText}>
+                        Already signed up?{' '}
+                        <Text
+                            style={styles.footerLink}
+                            onPress={() => router.replace('/(customer)/home')}
+                        >
+                            Skip →
+                        </Text>
                     </Text>
-                    <Text className="text-white font-body text-center mt-2 opacity-90">
-                        Make money on your schedule
-                    </Text>
-                </TouchableOpacity>
-            </View>
+                </Animated.View>
+            </SafeAreaView>
         </View>
     );
 }
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#F5F8FA',
+    },
+    safeArea: {
+        flex: 1,
+        paddingHorizontal: 24,
+    },
+    header: {
+        paddingTop: 60,
+        paddingBottom: 40,
+    },
+    title: {
+        fontSize: 34,
+        fontWeight: '800',
+        color: '#1A2332',
+        letterSpacing: -0.5,
+        lineHeight: 42,
+    },
+    subtitle: {
+        fontSize: 16,
+        color: '#8E99A4',
+        marginTop: 8,
+        fontWeight: '500',
+    },
+    cards: {
+        gap: 14,
+    },
+    card: {
+        backgroundColor: '#FFFFFF',
+        borderRadius: 20,
+        padding: 24,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 16,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.06,
+        shadowRadius: 12,
+        elevation: 3,
+    },
+    iconBg: {
+        width: 64,
+        height: 64,
+        borderRadius: 20,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    cardContent: {
+        flex: 1,
+    },
+    cardTitle: {
+        fontSize: 19,
+        fontWeight: '700',
+        color: '#1A2332',
+    },
+    cardSub: {
+        fontSize: 13,
+        color: '#8E99A4',
+        marginTop: 4,
+        lineHeight: 18,
+    },
+    footer: {
+        marginTop: 'auto',
+        paddingBottom: 32,
+        alignItems: 'center',
+    },
+    footerText: {
+        fontSize: 14,
+        color: '#8E99A4',
+    },
+    footerLink: {
+        color: '#4A9EC4',
+        fontWeight: '600',
+    },
+});
