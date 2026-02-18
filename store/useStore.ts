@@ -14,6 +14,10 @@ interface AppState {
     currentLocation: Location | null;
     setCurrentLocation: (location: Location) => void;
 
+    // Saved Home Address
+    homeAddress: string;
+    setHomeAddress: (address: string) => void;
+
     // UI State
     isLoading: boolean;
     setIsLoading: (loading: boolean) => void;
@@ -30,6 +34,9 @@ export const useStore = create<AppState>((set) => ({
 
     currentLocation: null,
     setCurrentLocation: (location) => set({ currentLocation: location }),
+
+    homeAddress: '',
+    setHomeAddress: (address) => set({ homeAddress: address }),
 
     isLoading: false,
     setIsLoading: (loading) => set({ isLoading: loading }),

@@ -1,16 +1,11 @@
 import React from 'react';
-import { View, TouchableOpacity, StyleSheet, Platform } from 'react-native';
+import { View, TouchableOpacity, StyleSheet, Platform, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
-import Animated, {
-    useAnimatedStyle,
-    withSpring,
-    useSharedValue,
-    withTiming,
-} from 'react-native-reanimated';
 
 interface TabItem {
     name: string;
+    label: string;
     icon: string;
     iconFocused: string;
 }
@@ -20,6 +15,9 @@ interface FloatingTabBarProps {
     activeIndex: number;
     onTabPress: (index: number) => void;
     accentColor?: string;
+    showFab?: boolean;
+    onFabPress?: () => void;
+    fabColor?: string;
 }
 
 export default function FloatingTabBar({
@@ -27,9 +25,12 @@ export default function FloatingTabBar({
     activeIndex,
     onTabPress,
     accentColor = '#6BB8D9',
+    showFab = false,
+    onFabPress,
+    fabColor = '#4CAF50',
 }: FloatingTabBarProps) {
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, showFab && styles.containerWithFab]}>
             <BlurView
                 intensity={80}
                 tint="dark"
@@ -51,15 +52,32 @@ export default function FloatingTabBar({
                                 ]}>
                                     <Ionicons
                                         name={(isActive ? tab.iconFocused : tab.icon) as any}
-                                        size={24}
+                                        size={22}
                                         color={isActive ? accentColor : '#8E99A4'}
                                     />
                                 </View>
+                                <Text style={[
+                                    styles.tabLabel,
+                                    isActive && { color: accentColor, fontWeight: '700' },
+                                ]}>
+                                    {tab.label}
+                                </Text>
                             </TouchableOpacity>
                         );
                     })}
                 </View>
             </BlurView>
+
+            {/* FAB — large green circle to the right */}
+            {showFab && onFabPress && (
+                <TouchableOpacity
+                    activeOpacity={0.85}
+                    onPress={onFabPress}
+                    style={[styles.fab, { backgroundColor: fabColor }]}
+                >
+                    <Ionicons name="add" size={30} color="#FFFFFF" />
+                </TouchableOpacity>
+            )}
         </View>
     );
 }
@@ -70,20 +88,24 @@ const styles = StyleSheet.create({
         bottom: Platform.OS === 'ios' ? 28 : 16,
         left: 24,
         right: 24,
+        flexDirection: 'row',
         alignItems: 'center',
+    },
+    containerWithFab: {
+        right: 24,
     },
     blurContainer: {
         borderRadius: 32,
         overflow: 'hidden',
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.1)',
-        width: '100%',
+        flex: 1,
     },
     innerContainer: {
         flexDirection: 'row',
         justifyContent: 'space-around',
         alignItems: 'center',
-        paddingVertical: 12,
+        paddingVertical: 8,
         paddingHorizontal: 8,
         backgroundColor: 'rgba(20, 25, 35, 0.65)',
     },
@@ -91,12 +113,32 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
+        gap: 2,
     },
     iconContainer: {
-        width: 48,
-        height: 48,
-        borderRadius: 24,
+        width: 42,
+        height: 42,
+        borderRadius: 21,
         alignItems: 'center',
         justifyContent: 'center',
+    },
+    tabLabel: {
+        fontSize: 10,
+        fontWeight: '500',
+        color: '#8E99A4',
+        marginTop: -2,
+    },
+    fab: {
+        width: 56,
+        height: 56,
+        borderRadius: 28,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginLeft: 12,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+        elevation: 8,
     },
 });

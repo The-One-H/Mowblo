@@ -7,6 +7,9 @@ import {
     StyleSheet,
     Alert,
     Modal,
+    TextInput,
+    Switch,
+    Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
@@ -15,13 +18,7 @@ import { useAuth, useUser } from '@clerk/clerk-expo';
 import { useRouter } from 'expo-router';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { Colors } from '../../constants/theme';
-
-const STATS = [
-    { icon: 'trophy', value: '235', label: 'Tokens', color: '#F6AD55' },
-    { icon: 'star', value: '4.6', label: 'Rating', color: '#F6D155' },
-    { icon: 'briefcase', value: '23', label: 'Jobs', color: '#68D391' },
-    { icon: 'people', value: '3', label: 'Clients', color: '#63B3ED' },
-];
+import { useReviews, useJobs } from '../../services/firebase';
 
 const BADGES = [
     { icon: 'flash', label: 'Quick Responder', color: '#F6AD55' },
@@ -32,34 +29,27 @@ const BADGES = [
 ];
 
 const SECTIONS = [
-    { id: 'tokens', label: 'Tokens', icon: 'trophy' },
     { id: 'reviews', label: 'Reviews', icon: 'chatbubbles' },
     { id: 'jobs', label: 'Job History', icon: 'briefcase' },
     { id: 'badges', label: 'Badges & Awards', icon: 'ribbon' },
-    { id: 'favorites', label: 'Favorites', icon: 'heart' },
-];
-
-const SETTINGS_ITEMS = [
-    { icon: 'person-outline', label: 'Edit Profile' },
-    { icon: 'shield-checkmark-outline', label: 'Verification' },
-    { icon: 'calendar-outline', label: 'Availability Schedule' },
-    { icon: 'card-outline', label: 'Payout Settings' },
-    { icon: 'build-outline', label: 'Equipment' },
-    { icon: 'location-outline', label: 'Service Area' },
-    { icon: 'notifications-outline', label: 'Notifications' },
-    { icon: 'document-text-outline', label: 'Documents' },
-    { icon: 'help-circle-outline', label: 'Help & Support' },
-    { icon: 'information-circle-outline', label: 'About' },
 ];
 
 export default function ProAccountScreen() {
     const { signOut } = useAuth();
+    const { userId } = useAuth();
     const { user } = useUser();
     const router = useRouter();
     const [expandedSection, setExpandedSection] = useState<string | null>(null);
     const [settingsOpen, setSettingsOpen] = useState(false);
 
+    const { reviews } = useReviews(userId);
+    const { jobs: completedJobs } = useJobs('pro', userId, ['completed']);
+    const { jobs: allJobs } = useJobs('pro', userId);
+
     const firstName = user?.firstName || 'Pro';
+    const avgRating = reviews.length > 0
+        ? (reviews.reduce((sum: number, r: any) => sum + r.rating, 0) / reviews.length).toFixed(1)
+        : '5.0';
 
     const handleSignOut = () => {
         Alert.alert('Sign Out', 'Are you sure?', [
@@ -75,6 +65,83 @@ export default function ProAccountScreen() {
         ]);
     };
 
+    const SETTINGS_ITEMS = [
+        {
+            icon: 'person-outline',
+            label: 'Edit Profile',
+            onPress: () =>
+                Alert.alert('Edit Profile', 'Profile info is managed via your Clerk account.', [
+                    { text: 'OK' },
+                    { text: 'Open Settings', onPress: () => Linking.openURL('https://accounts.clerk.dev') },
+                ]),
+        },
+        {
+            icon: 'shield-checkmark-outline',
+            label: 'Verification',
+            onPress: () =>
+                Alert.alert('Verification', 'Your identity is verified through Clerk authentication. To add additional verification, contact support.'),
+        },
+        {
+            icon: 'calendar-outline',
+            label: 'Availability Schedule',
+            onPress: () =>
+                Alert.alert('Availability', 'Set your weekly availability to receive jobs only when you\'re free. Coming soon!'),
+        },
+        {
+            icon: 'card-outline',
+            label: 'Payout Settings',
+            onPress: () => router.push('/(pro)/earnings'),
+        },
+        {
+            icon: 'build-outline',
+            label: 'Equipment',
+            onPress: () =>
+                Alert.alert('Equipment', 'List your available equipment (mower, snowblower, etc.) to get matched with relevant jobs. Coming soon!'),
+        },
+        {
+            icon: 'location-outline',
+            label: 'Service Area',
+            onPress: () =>
+                Alert.alert('Service Area', 'Define your service radius to only see jobs in your area. Coming soon!'),
+        },
+        {
+            icon: 'notifications-outline',
+            label: 'Notifications',
+            onPress: () =>
+                Alert.alert('Notifications', 'Push notification preferences', [
+                    { text: 'OK' },
+                ]),
+        },
+        {
+            icon: 'document-text-outline',
+            label: 'Documents',
+            onPress: () =>
+                Alert.alert('Documents', 'Upload insurance, licenses, and certifications to build trust with customers. Coming soon!'),
+        },
+        {
+            icon: 'help-circle-outline',
+            label: 'Help & Support',
+            onPress: () =>
+                Alert.alert('Help & Support', 'Need help?', [
+                    { text: 'Cancel', style: 'cancel' },
+                    { text: 'Email Support', onPress: () => Linking.openURL('mailto:support@mowblo.com') },
+                ]),
+        },
+        {
+            icon: 'information-circle-outline',
+            label: 'About',
+            onPress: () =>
+                Alert.alert('About Mowblo', 'Version 1.0.0\n\nMowblo connects homeowners with local landscaping and snow removal professionals.\n\n© 2025 Mowblo Inc.'),
+        },
+    ];
+
+    const STATS = [
+        { icon: 'star', value: avgRating, label: 'Rating', color: '#F6D155' },
+        { icon: 'briefcase', value: String(allJobs.length), label: 'Jobs', color: '#68D391' },
+        { icon: 'people', value: String(reviews.length), label: 'Reviews', color: '#63B3ED' },
+        { icon: 'cash', value: `$${completedJobs.reduce((s: number, j: any) => s + (j.proEarnings || 0), 0).toFixed(0)}`, label: 'Earned', color: '#F6AD55' },
+    ];
+
     return (
         <View style={styles.container}>
             <StatusBar style="light" />
@@ -83,7 +150,6 @@ export default function ProAccountScreen() {
                 contentContainerStyle={{ paddingBottom: 120 }}
             >
                 <SafeAreaView edges={['top']}>
-                    {/* Header with settings gear */}
                     <View style={styles.header}>
                         <Text style={styles.headerTitle}>Profile</Text>
                         <TouchableOpacity
@@ -97,13 +163,12 @@ export default function ProAccountScreen() {
 
                 {/* Profile Card */}
                 <Animated.View entering={FadeInDown.delay(100).duration(400)} style={styles.profileSection}>
-                    {/* Avatar with level ring */}
                     <View style={styles.avatarRing}>
                         <View style={styles.avatar}>
                             <Text style={styles.avatarText}>{firstName[0]?.toUpperCase() || 'P'}</Text>
                         </View>
                         <View style={styles.levelBadge}>
-                            <Text style={styles.levelText}>Lv 4</Text>
+                            <Text style={styles.levelText}>Lv {Math.min(Math.floor(allJobs.length / 5) + 1, 10)}</Text>
                         </View>
                     </View>
 
@@ -159,7 +224,46 @@ export default function ProAccountScreen() {
 
                         {expandedSection === section.id && (
                             <View style={styles.sectionContent}>
-                                {section.id === 'badges' ? (
+                                {section.id === 'reviews' && (
+                                    reviews.length > 0 ? (
+                                        reviews.map((review: any) => (
+                                            <View key={review.id} style={styles.reviewCard}>
+                                                <View style={styles.reviewStars}>
+                                                    {[1, 2, 3, 4, 5].map((s) => (
+                                                        <Ionicons
+                                                            key={s}
+                                                            name={s <= review.rating ? 'star' : 'star-outline'}
+                                                            size={14}
+                                                            color="#F6D155"
+                                                        />
+                                                    ))}
+                                                </View>
+                                                {review.comment ? (
+                                                    <Text style={styles.reviewText}>{review.comment}</Text>
+                                                ) : null}
+                                            </View>
+                                        ))
+                                    ) : (
+                                        <Text style={styles.emptyText}>No reviews yet</Text>
+                                    )
+                                )}
+
+                                {section.id === 'jobs' && (
+                                    allJobs.length > 0 ? (
+                                        allJobs.slice(0, 10).map((job: any) => (
+                                            <View key={job.id} style={styles.jobHistoryCard}>
+                                                <Text style={styles.jobHistoryTitle}>{job.title}</Text>
+                                                <Text style={styles.jobHistoryMeta}>
+                                                    {job.schedule?.date || 'N/A'} · ${job.proEarnings?.toFixed(2) || '0.00'}
+                                                </Text>
+                                            </View>
+                                        ))
+                                    ) : (
+                                        <Text style={styles.emptyText}>No jobs yet</Text>
+                                    )
+                                )}
+
+                                {section.id === 'badges' && (
                                     <View style={styles.badgeGrid}>
                                         {BADGES.map((badge) => (
                                             <View key={badge.label} style={styles.badgeItem}>
@@ -170,8 +274,6 @@ export default function ProAccountScreen() {
                                             </View>
                                         ))}
                                     </View>
-                                ) : (
-                                    <Text style={styles.emptyText}>Nothing here yet</Text>
                                 )}
                             </View>
                         )}
@@ -203,6 +305,7 @@ export default function ProAccountScreen() {
                                 <TouchableOpacity
                                     key={item.label}
                                     style={[styles.settingsItem, i < SETTINGS_ITEMS.length - 1 && styles.settingsItemBorder]}
+                                    onPress={item.onPress}
                                 >
                                     <Ionicons name={item.icon as any} size={22} color="#A0AEC0" />
                                     <Text style={styles.settingsItemLabel}>{item.label}</Text>
@@ -374,6 +477,41 @@ const styles = StyleSheet.create({
     sectionContent: {
         marginHorizontal: 20,
         paddingBottom: 16,
+    },
+    reviewCard: {
+        backgroundColor: '#161B22',
+        borderRadius: 12,
+        padding: 14,
+        marginBottom: 8,
+        borderWidth: 1,
+        borderColor: '#21262D',
+    },
+    reviewStars: {
+        flexDirection: 'row',
+        gap: 2,
+        marginBottom: 6,
+    },
+    reviewText: {
+        fontSize: 14,
+        color: '#A0AEC0',
+    },
+    jobHistoryCard: {
+        backgroundColor: '#161B22',
+        borderRadius: 12,
+        padding: 14,
+        marginBottom: 8,
+        borderWidth: 1,
+        borderColor: '#21262D',
+    },
+    jobHistoryTitle: {
+        fontSize: 15,
+        fontWeight: '600',
+        color: '#E2E8F0',
+    },
+    jobHistoryMeta: {
+        fontSize: 13,
+        color: '#718096',
+        marginTop: 4,
     },
     badgeGrid: {
         flexDirection: 'row',

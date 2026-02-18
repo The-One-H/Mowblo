@@ -141,7 +141,8 @@ export interface Job {
         date: string;
         startTime: string;
         endTime: string;
-        frequency: 'once' | 'daily' | 'weekly' | 'monthly';
+        frequency: 'once' | 'daily' | 'weekly' | 'biweekly' | 'monthly';
+        recurringDay?: string; // e.g. 'Monday' — for weekly/biweekly
     };
     tasks: { label: string; completed: boolean }[];
     addons: string[];
@@ -152,6 +153,7 @@ export interface Job {
     platformFee: number;
     proEarnings: number;
     paymentIntentId?: string;
+    reviewed?: boolean;
     createdAt: any;
     updatedAt: any;
 }
@@ -306,6 +308,66 @@ export function useReviews(userId: string | null | undefined) {
 export async function createReview(review: Omit<Review, 'id' | 'createdAt'>) {
     return addDoc(collection(db, 'reviews'), {
         ...review,
+        createdAt: serverTimestamp(),
+    });
+}
+
+// ============================================================
+// Payouts (tracked in Firebase for history)
+// ============================================================
+
+export interface Payout {
+    id?: string;
+    userId: string;
+    stripePayoutId: string;
+    amount: number;
+    fee: number;
+    netAmount: number;
+    method: 'instant' | 'standard';
+    status: 'pending' | 'in_transit' | 'paid' | 'failed' | 'canceled';
+    payoutMethodLast4?: string;
+    payoutMethodType?: 'bank_account' | 'card';
+    createdAt: any;
+    arrivedAt?: any;
+}
+
+export function usePayouts(userId: string | null | undefined) {
+    const [payouts, setPayouts] = useState<Payout[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        if (!userId) {
+            setPayouts([]);
+            setLoading(false);
+            return;
+        }
+
+        const q = query(
+            collection(db, 'payouts'),
+            where('userId', '==', userId),
+            orderBy('createdAt', 'desc')
+        );
+
+        const unsub = onSnapshot(q, (snap) => {
+            const results: Payout[] = [];
+            snap.forEach((doc) => {
+                const data = doc.data() as Payout;
+                data.id = doc.id;
+                results.push(data);
+            });
+            setPayouts(results);
+            setLoading(false);
+        });
+
+        return unsub;
+    }, [userId]);
+
+    return { payouts, loading };
+}
+
+export async function recordPayout(payout: Omit<Payout, 'id' | 'createdAt'>) {
+    return addDoc(collection(db, 'payouts'), {
+        ...payout,
         createdAt: serverTimestamp(),
     });
 }

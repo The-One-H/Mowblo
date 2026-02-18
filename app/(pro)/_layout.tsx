@@ -5,9 +5,9 @@ import FloatingTabBar from '../../components/ui/FloatingTabBar';
 import { Colors } from '../../constants/theme';
 
 const PRO_TABS = [
-    { name: 'dashboard', icon: 'grid-outline', iconFocused: 'grid' },
-    { name: 'earnings', icon: 'wallet-outline', iconFocused: 'wallet' },
-    { name: 'account', icon: 'person-outline', iconFocused: 'person' },
+    { name: 'dashboard', label: 'Dashboard', icon: 'grid-outline', iconFocused: 'grid' },
+    { name: 'earnings', label: 'Earnings', icon: 'wallet-outline', iconFocused: 'wallet' },
+    { name: 'account', label: 'Account', icon: 'person-outline', iconFocused: 'person' },
 ];
 
 export default function ProLayout() {
